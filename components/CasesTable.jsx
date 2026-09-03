@@ -9,8 +9,6 @@ import {
   ChevronDown,
   ChevronUp,
   ArrowUpDown,
-  ExternalLink,
-  Eye,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -22,7 +20,7 @@ import Stars from "./Stars";
 import PdfModal from "./PdfModal";
 
 const COLUMNS = [
-  { key: "report_number", label: "Report #", mono: true, width: 140 },
+  { key: "report_number", label: "Report #", mono: true, width: 185 },
   { key: "charges_number", label: "Charge #", width: 90 },
   { key: "pd", label: "Agency", width: 170 },
   { key: "suspect", label: "Suspect", width: 180 },
@@ -31,7 +29,7 @@ const COLUMNS = [
   { key: "incident_date", label: "Date", width: 100 },
   { key: "charges", label: "Charges", width: 240 },
   { key: "rating", label: "Rating", width: 110 },
-  { key: "pdf", label: "Report", width: 160 },
+  { key: "pdf", label: "Report", width: 100 },
 ];
 
 const TAB_KEYS = ["Open", "Skipped", "Closed"];
@@ -55,25 +53,14 @@ function ChargeCount({ n }) {
 
 function ReportCell({ caseItem, onViewPdf }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <a
-        href={`/cases/${caseItem.id}`}
-        target="_blank"
-        rel="noreferrer"
-        className="flex items-center gap-1 px-2 py-1 text-xs rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97]"
-      >
-        <FileText size={11} />
-        Report
-        <ExternalLink size={10} />
-      </a>
-      <button
-        onClick={() => onViewPdf(caseItem)}
-        title="Quick PDF preview"
-        className="flex items-center justify-center p-1.5 rounded border border-neutral-800 text-neutral-500 hover:text-neutral-300 hover:bg-neutral-900 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95]"
-      >
-        <Eye size={13} />
-      </button>
-    </div>
+    <button
+      onClick={() => onViewPdf(caseItem)}
+      title="View PDF report"
+      className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border border-neutral-800 text-neutral-400 hover:text-amber-400 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all duration-150"
+    >
+      <FileText size={13} />
+      Read
+    </button>
   );
 }
 
@@ -440,8 +427,15 @@ export default function CasesTable() {
           <tbody>
             {rows.map((c, idx) => (
               <tr key={c.id} className="border-b border-neutral-900 hover:bg-neutral-900/40 transition-colors duration-150 animate-row-in" style={{ animationDelay: `${Math.min(idx, 20) * 15}ms` }}>
-                <td className="px-3 py-2 font-mono text-xs text-neutral-400 truncate">
-                  {c.report_number}
+                <td className="px-3 py-2 font-mono text-xs truncate">
+                  <a
+                    href={`/cases/${c.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-neutral-400 hover:text-amber-400 hover:underline transition-colors"
+                  >
+                    {c.report_number}
+                  </a>
                 </td>
                 <td className="px-3 py-2">
                   <ChargeCount n={c.charges_number} />
