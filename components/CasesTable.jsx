@@ -215,7 +215,7 @@ export default function CasesTable() {
       if (debouncedQuery.trim()) {
         const term = `%${debouncedQuery.trim()}%`;
         q = q.or(
-          `report_number.ilike.${term},suspect.ilike.${term},charges.ilike.${term},incident_type.ilike.${term},pd.ilike.${term},incident_type.ilike.${term}`
+          `report_number.ilike.${term},suspect.ilike.${term},charges.ilike.${term},incident_type.ilike.${term},pd.ilike.${term}`
         );
       }
 
