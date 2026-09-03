@@ -26,7 +26,7 @@ export default function PdfModal({ caseItem, onClose }) {
 
       if (!caseItem.pdf_path) {
         if (active) {
-          setError("Este caso no tiene un PDF asociado todavía.");
+          setError("This case doesn't have a PDF attached yet.");
           setLoading(false);
         }
         return;
@@ -35,14 +35,14 @@ export default function PdfModal({ caseItem, onClose }) {
       if (!isSupabaseConfigured) {
         if (active) {
           setError(
-            "Modo de prueba: conecta Supabase (.env.local) para ver PDFs reales aquí."
+            "Test mode: connect Supabase (.env.local) to view real PDFs here."
           );
           setLoading(false);
         }
         return;
       }
 
-      // Bucket privado: pedimos una signed URL válida por 10 minutos.
+      // Private bucket: request a signed URL valid for 10 minutes.
       const { data, error: signError } = await supabase.storage
         .from(PDF_BUCKET)
         .createSignedUrl(caseItem.pdf_path, 600);
@@ -50,7 +50,7 @@ export default function PdfModal({ caseItem, onClose }) {
       if (!active) return;
 
       if (signError) {
-        setError("No se pudo cargar el PDF: " + signError.message);
+        setError("Couldn't load the PDF: " + signError.message);
       } else {
         setUrl(data.signedUrl);
       }
@@ -65,11 +65,11 @@ export default function PdfModal({ caseItem, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6 animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="bg-neutral-900 border border-neutral-800 rounded-lg w-full max-w-3xl h-[85vh] flex flex-col"
+        className="bg-neutral-900 border border-neutral-800 rounded-lg w-full max-w-3xl h-[85vh] flex flex-col animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-800 shrink-0">
@@ -87,7 +87,7 @@ export default function PdfModal({ caseItem, onClose }) {
                 rel="noreferrer"
                 className="flex items-center gap-1 text-xs text-amber-400 hover:underline"
               >
-                Abrir en pestaña nueva <ExternalLink size={11} />
+                Open in new tab <ExternalLink size={11} />
               </a>
             )}
             <button onClick={onClose} className="text-neutral-500 hover:text-neutral-300">
@@ -100,7 +100,7 @@ export default function PdfModal({ caseItem, onClose }) {
           {loading && (
             <div className="h-full flex flex-col items-center justify-center gap-2 text-neutral-600">
               <Loader2 size={28} className="animate-spin" />
-              <p className="text-sm">Cargando PDF...</p>
+              <p className="text-sm">Loading PDF...</p>
             </div>
           )}
           {!loading && error && (

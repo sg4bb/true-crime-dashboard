@@ -26,7 +26,7 @@ export default function CasePdfViewer({ caseItem }) {
 
       if (!caseItem.pdf_path) {
         if (active) {
-          setError("Este caso no tiene un PDF asociado todavía.");
+          setError("This case doesn't have a PDF attached yet.");
           setLoading(false);
         }
         return;
@@ -34,7 +34,7 @@ export default function CasePdfViewer({ caseItem }) {
 
       if (!isSupabaseConfigured) {
         if (active) {
-          setError("Modo de prueba: conecta Supabase para ver PDFs reales aquí.");
+          setError("Test mode: connect Supabase to view real PDFs here.");
           setLoading(false);
         }
         return;
@@ -47,7 +47,7 @@ export default function CasePdfViewer({ caseItem }) {
       if (!active) return;
 
       if (signError) {
-        setError("No se pudo cargar el PDF: " + signError.message);
+        setError("Couldn't load the PDF: " + signError.message);
       } else {
         setUrl(data.signedUrl);
       }
@@ -64,7 +64,7 @@ export default function CasePdfViewer({ caseItem }) {
     return (
       <div className="h-[70vh] flex flex-col items-center justify-center gap-2 text-neutral-600 border border-neutral-800 rounded-lg">
         <Loader2 size={28} className="animate-spin" />
-        <p className="text-sm">Cargando PDF...</p>
+        <p className="text-sm">Loading PDF...</p>
       </div>
     );
   }
@@ -87,7 +87,7 @@ export default function CasePdfViewer({ caseItem }) {
           rel="noreferrer"
           className="flex items-center gap-1 text-xs text-amber-400 hover:underline"
         >
-          Abrir PDF en pestaña nueva <ExternalLink size={11} />
+          Open PDF in new tab <ExternalLink size={11} />
         </a>
       </div>
       <iframe src={url} title="Incident report PDF" className="w-full h-[70vh] bg-neutral-950" />

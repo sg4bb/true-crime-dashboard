@@ -69,12 +69,12 @@ export default async function CaseDetailPage({ params }) {
   if (notFound) {
     return (
       <div className="max-w-2xl mx-auto p-10 text-center">
-        <h1 className="text-lg font-semibold text-neutral-100 mb-2">Caso no encontrado</h1>
+        <h1 className="text-lg font-semibold text-neutral-100 mb-2">Case not found</h1>
         <p className="text-sm text-neutral-500 mb-4">
-          No existe ningún caso con ese identificador.
+          There's no case with that identifier.
         </p>
         <Link href="/" className="text-sm text-amber-400 hover:underline">
-          Volver a la tabla
+          Back to table
         </Link>
       </div>
     );
@@ -88,7 +88,7 @@ export default async function CaseDetailPage({ params }) {
         href="/"
         className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-300 mb-4 w-fit"
       >
-        <ArrowLeft size={12} /> Volver a casos
+        <ArrowLeft size={12} /> Back to cases
       </Link>
 
       <div className="flex items-start justify-between mb-2">
@@ -115,23 +115,23 @@ export default async function CaseDetailPage({ params }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Columna izquierda: detalles, cargos, notas */}
+        {/* Left column: details, charges, notes */}
         <div className="lg:col-span-2 flex flex-col gap-4">
-          <Card title="Detalles del caso">
+          <Card title="Case Details">
             <div className="grid grid-cols-1 gap-3">
               <Field label="Report #" value={caseItem.report_number} />
-              <Field label="N° de Cargos" value={caseItem.charges_number} />
-              <Field label="Agencia" value={caseItem.pd} />
-              <Field label="Tipo de incidente" value={caseItem.incident_type} />
-              <Field label="Fecha del incidente" value={caseItem.incident_date} />
-              <Field label="Ubicación" value={caseItem.incident_location} />
-              <Field label="Sospechoso" value={caseItem.suspect} />
-              <Field label="DOB del sospechoso" value={caseItem.suspect_dob} />
-              <Field label="Oficiales" value={caseItem.police_officers} />
+              <Field label="Charge #" value={caseItem.charges_number} />
+              <Field label="Agency" value={caseItem.pd} />
+              <Field label="Incident Type" value={caseItem.incident_type} />
+              <Field label="Incident Date" value={caseItem.incident_date} />
+              <Field label="Location" value={caseItem.incident_location} />
+              <Field label="Suspect" value={caseItem.suspect} />
+              <Field label="Suspect DOB" value={caseItem.suspect_dob} />
+              <Field label="Officers" value={caseItem.police_officers} />
             </div>
           </Card>
 
-          <Card title={`Cargos${charges.length ? ` · ${charges.length}` : ""}`}>
+          <Card title={`Charges${charges.length ? ` · ${charges.length}` : ""}`}>
             {charges.length > 0 ? (
               <ul className="flex flex-col gap-2">
                 {charges.map((charge, i) => (
@@ -141,26 +141,26 @@ export default async function CaseDetailPage({ params }) {
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-neutral-600">Sin cargos registrados.</p>
+              <p className="text-sm text-neutral-600">No charges on record.</p>
             )}
           </Card>
 
           {caseItem.summary && (
-            <Card title="Resumen">
+            <Card title="Summary">
               <p className="text-sm text-neutral-300 whitespace-pre-line leading-relaxed">
                 {caseItem.summary}
               </p>
             </Card>
           )}
 
-          <Card title="Notas">
+          <Card title="Notes">
             <p className="text-sm text-neutral-300 whitespace-pre-line">
-              {caseItem.notes || <span className="text-neutral-600">Sin notas.</span>}
+              {caseItem.notes || <span className="text-neutral-600">No notes.</span>}
             </p>
           </Card>
         </div>
 
-        {/* Columna derecha: incident report */}
+        {/* Right column: incident report */}
         <div className="lg:col-span-3">
           <div className="sticky top-6">
             <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 uppercase tracking-wide mb-2">

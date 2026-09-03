@@ -23,20 +23,20 @@ import PdfModal from "./PdfModal";
 
 const COLUMNS = [
   { key: "report_number", label: "Report #", mono: true, width: 140 },
-  { key: "charges_number", label: "N° Cargos", width: 90 },
-  { key: "pd", label: "Agencia", width: 170 },
-  { key: "suspect", label: "Sospechoso", width: 180 },
-  { key: "incident_type", label: "Tipo", width: 160 },
-  { key: "status", label: "Estado", width: 100 },
-  { key: "incident_date", label: "Fecha", width: 100 },
-  { key: "charges", label: "Cargos", width: 240 },
+  { key: "charges_number", label: "Charge #", width: 90 },
+  { key: "pd", label: "Agency", width: 170 },
+  { key: "suspect", label: "Suspect", width: 180 },
+  { key: "incident_type", label: "Type", width: 160 },
+  { key: "status", label: "Status", width: 100 },
+  { key: "incident_date", label: "Date", width: 100 },
+  { key: "charges", label: "Charges", width: 240 },
   { key: "rating", label: "Rating", width: 110 },
-  { key: "pdf", label: "Reporte", width: 160 },
+  { key: "pdf", label: "Report", width: 160 },
 ];
 
 const TAB_KEYS = ["Open", "Skipped", "Closed"];
 const TABS = [
-  { key: "all", label: "Todos" },
+  { key: "all", label: "All" },
   { key: "Open", label: "Open" },
   { key: "Skipped", label: "Skipped" },
   { key: "Closed", label: "Closed" },
@@ -63,12 +63,12 @@ function ReportCell({ caseItem, onViewPdf }) {
         className="flex items-center gap-1 px-2 py-1 text-xs rounded border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97]"
       >
         <FileText size={11} />
-        Reporte
+        Report
         <ExternalLink size={10} />
       </a>
       <button
         onClick={() => onViewPdf(caseItem)}
-        title="Vista rápida del PDF"
+        title="Quick PDF preview"
         className="flex items-center justify-center p-1.5 rounded border border-neutral-800 text-neutral-500 hover:text-neutral-300 hover:bg-neutral-900 transition-all duration-150 hover:scale-[1.05] active:scale-[0.95]"
       >
         <Eye size={13} />
@@ -77,7 +77,7 @@ function ReportCell({ caseItem, onViewPdf }) {
   );
 }
 
-// --- Modo de prueba: filtra/ordena/pagina el arreglo MOCK_CASES en memoria ---
+// --- Test mode: filters/sorts/paginates the MOCK_CASES array in memory ---
 function runMockQuery({ tab, query, sortKey, sortDir, page, pageSize, dateFrom, dateTo }) {
   let rows = MOCK_CASES.filter((c) => (tab === "all" ? true : c.status === tab));
 
@@ -141,7 +141,7 @@ export default function CasesTable() {
 
   const resetToFirstPage = () => setPage(1);
 
-  // Debounce del buscador: espera a que el usuario deje de escribir antes de consultar.
+  // Search debounce: waits for the user to stop typing before querying.
   useEffect(() => {
     const t = setTimeout(() => {
       setDebouncedQuery(query);
@@ -150,7 +150,7 @@ export default function CasesTable() {
     return () => clearTimeout(t);
   }, [query]);
 
-  // Conteos por tab (independientes de la búsqueda/orden actual).
+  // Per-tab counts (independent of the current search/sort).
   useEffect(() => {
     let active = true;
 
@@ -178,7 +178,7 @@ export default function CasesTable() {
           setTabCounts({ all: allCount || 0, ...Object.fromEntries(perStatus) });
         }
       } catch (e) {
-        console.error("Error cargando conteos:", e);
+        console.error("Error loading counts:", e);
       }
     }
 
@@ -188,7 +188,7 @@ export default function CasesTable() {
     };
   }, []);
 
-  // Consulta principal: se re-ejecuta cuando cambia tab, búsqueda, orden, página o tamaño de página.
+  // Main query: re-runs whenever tab, search, sort, page, page size, or date range changes.
   useEffect(() => {
     let active = true;
 
@@ -239,7 +239,7 @@ export default function CasesTable() {
       if (!active) return;
 
       if (error) {
-        console.error("Error consultando Supabase:", error);
+        console.error("Error querying Supabase:", error);
         setErrorMsg(error.message);
         setRows([]);
         setTotalCount(0);
@@ -261,7 +261,7 @@ export default function CasesTable() {
   const rangeStart = totalCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const rangeEnd = Math.min(currentPage * pageSize, totalCount);
 
-  // Si la página actual quedó fuera de rango (ej. una búsqueda redujo los resultados), ajústala.
+  // If the current page falls out of range (e.g. a search shrank the results), fix it.
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [totalPages, page]);
@@ -280,9 +280,9 @@ export default function CasesTable() {
     <div className="max-w-6xl mx-auto p-6">
       {!isSupabaseConfigured && (
         <div className="mb-4 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs rounded-md px-3 py-2">
-          Mostrando datos de prueba — Supabase no está configurado todavía. Completa
-          NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY en tu .env.local para
-          conectar tus casos reales.
+          Showing test data — Supabase isn't configured yet. Fill in
+          NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your .env.local
+          to connect your real cases.
         </div>
       )}
 
@@ -295,12 +295,12 @@ export default function CasesTable() {
         <p className="text-sm text-neutral-500 mt-1 flex items-center gap-1.5">
           {loading ? (
             <>
-              <Loader2 size={12} className="animate-spin" /> Cargando...
+              <Loader2 size={12} className="animate-spin" /> Loading...
             </>
           ) : (
             <>
-              {totalCount.toLocaleString()} casos · Ordena cualquier columna o abre un
-              reporte en línea.
+              {totalCount.toLocaleString()} cases · Sort any column or open a report
+              inline.
             </>
           )}
         </p>
@@ -339,12 +339,12 @@ export default function CasesTable() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by Report Number, Agency, Suspect..."
-            className="w-full bg-neutral-900/80 border border-neutral-800 rounded-lg pl-9 pr-8 py-2 text-sm text-neutral-200 placeholder-neutral-500 shadow-sm shadow-black/20 transition-colors focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
+            className="w-full h-10 bg-neutral-900/80 border border-neutral-800 rounded-lg pl-9 pr-8 text-sm text-neutral-200 placeholder-neutral-500 shadow-sm shadow-black/20 transition-colors focus:outline-none focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/10"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              title="Limpiar búsqueda"
+              title="Clear search"
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors"
             >
               <X size={14} />
@@ -352,8 +352,8 @@ export default function CasesTable() {
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 bg-neutral-900/80 border border-neutral-800 rounded-lg px-2.5 py-1.5 shadow-sm shadow-black/20">
-          <span className="text-xs text-neutral-500 pl-0.5">Date</span>
+        <div className="flex items-center gap-1.5 h-10 bg-neutral-900/80 border border-neutral-800 rounded-lg px-2.5 shadow-sm shadow-black/20">
+          <span className="text-xs text-neutral-500 pl-0.5">From</span>
           <input
             type="date"
             value={pendingDateFrom}
@@ -376,7 +376,7 @@ export default function CasesTable() {
                 setDateTo("");
                 resetToFirstPage();
               }}
-              title="Limpiar rango de fechas"
+              title="Clear date range"
               className="flex items-center p-1 text-neutral-500 hover:text-neutral-300 transition-colors"
             >
               <X size={13} />
@@ -390,7 +390,7 @@ export default function CasesTable() {
             setDateTo(pendingDateTo);
             resetToFirstPage();
           }}
-          className="relative flex items-center gap-1.5 px-3.5 py-2 text-xs font-medium rounded-lg bg-amber-500 text-neutral-950 shadow-sm shadow-amber-500/20 transition-all duration-150 hover:bg-amber-400 hover:shadow-md hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97]"
+          className="relative flex items-center gap-1.5 h-10 px-3.5 text-xs font-medium rounded-lg bg-amber-500 text-neutral-950 shadow-sm shadow-amber-500/20 transition-all duration-150 hover:bg-amber-400 hover:shadow-md hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97]"
         >
           <Search size={13} strokeWidth={2.5} />
           Search
@@ -473,7 +473,7 @@ export default function CasesTable() {
             {!loading && rows.length === 0 && (
               <tr>
                 <td colSpan={COLUMNS.length} className="px-3 py-8 text-center text-neutral-600 text-sm">
-                  {errorMsg ? `Error: ${errorMsg}` : "Ningún caso coincide con esta búsqueda."}
+                  {errorMsg ? `Error: ${errorMsg}` : "No cases match this search."}
                 </td>
               </tr>
             )}
@@ -483,11 +483,11 @@ export default function CasesTable() {
 
       <div className="flex items-center justify-between mt-3">
         <p className="text-xs text-neutral-500">
-          Mostrando {rangeStart}–{rangeEnd} de {totalCount.toLocaleString()} casos
+          Showing {rangeStart}–{rangeEnd} of {totalCount.toLocaleString()} cases
         </p>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs text-neutral-500">
-            Por página
+            Per page
             <select
               value={pageSize}
               onChange={(e) => {
@@ -507,7 +507,7 @@ export default function CasesTable() {
               disabled={currentPage <= 1}
               className="flex items-center gap-1 px-2 py-1 text-xs border border-neutral-800 rounded-md text-neutral-400 hover:bg-neutral-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             >
-              <ChevronLeft size={12} /> Anterior
+              <ChevronLeft size={12} /> Previous
             </button>
             <span className="text-xs text-neutral-500 px-2">
               {currentPage} / {totalPages}
@@ -517,7 +517,7 @@ export default function CasesTable() {
               disabled={currentPage >= totalPages}
               className="flex items-center gap-1 px-2 py-1 text-xs border border-neutral-800 rounded-md text-neutral-400 hover:bg-neutral-900 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             >
-              Siguiente <ChevronRight size={12} />
+              Next <ChevronRight size={12} />
             </button>
           </div>
         </div>
