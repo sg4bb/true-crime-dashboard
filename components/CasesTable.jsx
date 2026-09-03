@@ -79,7 +79,7 @@ function ReportCell({ caseItem, onViewPdf }) {
 }
 
 // --- Modo de prueba: filtra/ordena/pagina el arreglo MOCK_CASES en memoria ---
-function runMockQuery({ tab, query, sortKey, sortDir, page, pageSize }) {
+function runMockQuery({ tab, query, sortKey, sortDir, page, pageSize, dateFrom, dateTo }) {
   let rows = MOCK_CASES.filter((c) => (tab === "all" ? true : c.status === tab));
 
   if (query.trim()) {
@@ -92,6 +92,9 @@ function runMockQuery({ tab, query, sortKey, sortDir, page, pageSize }) {
         (c.incident_type || "").toLowerCase().includes(q)
     );
   }
+
+  if (dateFrom) rows = rows.filter((c) => (c.incident_date || "") >= dateFrom);
+  if (dateTo) rows = rows.filter((c) => (c.incident_date || "") <= dateTo);
 
   rows = [...rows].sort((a, b) => {
     const av = a[sortKey] ?? "";
@@ -121,6 +124,10 @@ export default function CasesTable() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [activeCase, setActiveCase] = useState(null);
+  const [pendingDateFrom, setPendingDateFrom] = useState("");
+  const [pendingDateTo, setPendingDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const [rows, setRows] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -199,6 +206,8 @@ export default function CasesTable() {
           sortDir,
           page,
           pageSize,
+          dateFrom,
+          dateTo,
         });
         if (active) {
           setRows(mockRows);
@@ -218,6 +227,9 @@ export default function CasesTable() {
           `report_number.ilike.${term},suspect.ilike.${term},charges.ilike.${term},incident_type.ilike.${term},pd.ilike.${term}`
         );
       }
+
+      if (dateFrom) q = q.gte("incident_date", dateFrom);
+      if (dateTo) q = q.lte("incident_date", dateTo);
 
       q = q.order(sortKey, { ascending: sortDir === "asc", nullsFirst: false });
 
@@ -244,7 +256,7 @@ export default function CasesTable() {
     return () => {
       active = false;
     };
-  }, [tab, debouncedQuery, sortKey, sortDir, page, pageSize]);
+  }, [tab, debouncedQuery, sortKey, sortDir, page, pageSize, dateFrom, dateTo]);
 
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const currentPage = Math.min(page, totalPages);
@@ -313,26 +325,72 @@ export default function CasesTable() {
         ))}
       </div>
 
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex flex-wrap items-center gap-2 mb-3">
         <div className="relative flex-1 max-w-sm">
           <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-neutral-600" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por caso, sospechoso o cargos..."
+            placeholder="Search by Report Number, Agency, Suspect..."
             className="w-full bg-neutral-900 border border-neutral-800 rounded-md pl-8 pr-3 py-1.5 text-sm text-neutral-200 placeholder-neutral-600 focus:outline-none focus:border-neutral-600"
           />
         </div>
-        <button className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border border-neutral-800 rounded-md text-neutral-400 hover:bg-neutral-900">
-          <Filter size={12} />
-          Filtro
+
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-neutral-500">Date</span>
+          <input
+            type="date"
+            value={pendingDateFrom}
+            onChange={(e) => setPendingDateFrom(e.target.value)}
+            className="bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-neutral-600"
+          />
+          <span className="text-xs text-neutral-600">to</span>
+          <input
+            type="date"
+            value={pendingDateTo}
+            onChange={(e) => setPendingDateTo(e.target.value)}
+            className="bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-xs text-neutral-300 focus:outline-none focus:border-neutral-600"
+          />
+          {(dateFrom || dateTo || pendingDateFrom || pendingDateTo) && (
+            <button
+              onClick={() => {
+                setPendingDateFrom("");
+                setPendingDateTo("");
+                setDateFrom("");
+                setDateTo("");
+                resetToFirstPage();
+              }}
+              title="Limpiar rango de fechas"
+              className="flex items-center p-1.5 text-xs text-neutral-500 hover:text-neutral-300"
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+
+        <button
+          onClick={() => {
+            setDateFrom(pendingDateFrom);
+            setDateTo(pendingDateTo);
+            resetToFirstPage();
+          }}
+          className="relative flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-all duration-150 hover:scale-[1.03] active:scale-[0.97]"
+        >
+          <Search size={15} />
+          Search
+          {(pendingDateFrom !== dateFrom || pendingDateTo !== dateTo) && (
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-4">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
+            </span>
+          )}
         </button>
         {query && (
           <button
             onClick={() => setQuery("")}
             className="flex items-center gap-1 px-2 py-1.5 text-xs text-neutral-500 hover:text-neutral-300"
           >
-            <X size={12} /> Limpiar
+            <X size={12} /> Limpiar búsqueda
           </button>
         )}
       </div>
