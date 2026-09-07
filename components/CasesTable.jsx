@@ -427,7 +427,7 @@ export default function CasesTable() {
                   </div>
                 </td>
                 <td className="px-3 py-2">
-                  <span className="inline-flex max-w-full px-2 py-0.5 rounded text-xs border border-neutral-700 text-neutral-400 truncate">
+                  <span className="flex w-full px-1 py-1 rounded text-xs border border-neutral-700 text-neutral-400 truncate">
                     {c.pd}
                   </span>
                 </td>
