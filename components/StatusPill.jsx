@@ -9,7 +9,7 @@ const STATUS_STYLES = {
 export default function StatusPill({ status }) {
   const style = STATUS_STYLES[status] || "bg-neutral-700 text-neutral-300";
   return (
-    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${style}`}>
+    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide  ${style}`}>
       {status}
     </span>
   );

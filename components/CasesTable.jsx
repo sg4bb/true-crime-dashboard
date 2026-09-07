@@ -20,16 +20,15 @@ import Stars from "./Stars";
 import PdfModal from "./PdfModal";
 
 const COLUMNS = [
-  { key: "report_number", label: "Report #", mono: true, width: 185 },
-  { key: "charges_number", label: "Charge #", width: 90 },
+  { key: "report_number", label: "Report #", mono: true, width: 215 },
   { key: "pd", label: "Agency", width: 170 },
   { key: "suspect", label: "Suspect", width: 180 },
   { key: "incident_type", label: "Type", width: 160 },
   { key: "status", label: "Status", width: 100 },
   { key: "incident_date", label: "Date", width: 100 },
+  { key: "charges_number", label: "Charge #", width: 90 },
   { key: "charges", label: "Charges", width: 240 },
   { key: "rating", label: "Rating", width: 110 },
-  { key: "pdf", label: "Report", width: 100 },
 ];
 
 const TAB_KEYS = ["Open", "Skipped", "Closed"];
@@ -48,19 +47,6 @@ function ChargeCount({ n }) {
     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/15 text-amber-400 text-xs font-semibold">
       {n}
     </span>
-  );
-}
-
-function ReportCell({ caseItem, onViewPdf }) {
-  return (
-    <button
-      onClick={() => onViewPdf(caseItem)}
-      title="View PDF report"
-      className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md border border-neutral-800 text-neutral-400 hover:text-amber-400 hover:border-amber-500/40 hover:bg-amber-500/5 transition-all duration-150"
-    >
-      <FileText size={13} />
-      Read
-    </button>
   );
 }
 
@@ -377,7 +363,7 @@ export default function CasesTable() {
             setDateTo(pendingDateTo);
             resetToFirstPage();
           }}
-          className="relative flex items-center gap-1.5 h-10 px-3.5 text-xs font-medium rounded-lg bg-amber-500 text-neutral-950 shadow-sm shadow-amber-500/20 transition-all duration-150 hover:bg-amber-400 hover:shadow-md hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97]"
+          className="relative flex items-center gap-1.5 h-10 px-3.5 text-xs font-medium rounded-lg bg-amber-500 text-neutral-950 shadow-sm shadow-amber-500/20 transition-all duration-150 hover:bg-amber-400 active:scale-[0.97]"
         >
           <Search size={13} strokeWidth={2.5} />
           Search
@@ -402,43 +388,45 @@ export default function CasesTable() {
             ))}
           </colgroup>
           <thead>
-            <tr className="bg-neutral-900/60 border-b border-neutral-800">
+            <tr className="bg-neutral-800/50 border-b border-neutral-800">
               {COLUMNS.map((col) => (
                 <th key={col.key} className="text-left px-3 py-2 text-xs font-medium text-neutral-500 whitespace-nowrap">
-                  {col.key === "pdf" ? (
-                    col.label
-                  ) : (
-                    <button
-                      onClick={() => toggleSort(col.key)}
-                      className="flex items-center gap-1 hover:text-neutral-300"
-                    >
-                      {col.label}
-                      {sortKey === col.key ? (
-                        sortDir === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />
-                      ) : (
-                        <ArrowUpDown size={10} className="opacity-40" />
-                      )}
-                    </button>
-                  )}
+                  <button
+                    onClick={() => toggleSort(col.key)}
+                    className="flex items-center gap-1 hover:text-neutral-300"
+                  >
+                    {col.label}
+                    {sortKey === col.key ? (
+                      sortDir === "asc" ? <ChevronUp size={12} /> : <ChevronDown size={12} />
+                    ) : (
+                      <ArrowUpDown size={10} className="opacity-40" />
+                    )}
+                  </button>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((c, idx) => (
-              <tr key={c.id} className="border-b border-neutral-900 hover:bg-neutral-900/40 transition-colors duration-150 animate-row-in" style={{ animationDelay: `${Math.min(idx, 20) * 15}ms` }}>
-                <td className="px-3 py-2 font-mono text-xs truncate">
-                  <a
-                    href={`/cases/${c.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-neutral-400 hover:text-amber-400 hover:underline transition-colors"
-                  >
-                    {c.report_number}
-                  </a>
-                </td>
-                <td className="px-3 py-2">
-                  <ChargeCount n={c.charges_number} />
+              <tr key={c.id} className="border-b border-neutral-900 border-l-2 border-l-transparent hover:border-l-amber-500 hover:bg-neutral-800/50 transition-colors duration-150 animate-row-in" style={{ animationDelay: `${Math.min(idx, 20) * 15}ms` }}>
+                <td className="px-3 py-2 font-mono text-xs">
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={`/cases/${c.id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-neutral-400 hover:text-amber-400 hover:underline transition-colors truncate"
+                    >
+                      {c.report_number}
+                    </a>
+                    <button
+                      onClick={() => setActiveCase(c)}
+                      title="View PDF report"
+                      className="shrink-0 flex items-center gap-1 px-2 py-1 text-xs font-semibold tracking-wide rounded-full bg-amber-500 text-white shadow-sm shadow-amber-500/20 hover:bg-amber-400 hover:shadow-md hover:shadow-amber-500/30 transition-all duration-150 active:scale-90"
+                    >
+                      <FileText size={14} />
+                    </button>
+                  </div>
                 </td>
                 <td className="px-3 py-2">
                   <span className="inline-flex max-w-full px-2 py-0.5 rounded text-xs border border-neutral-700 text-neutral-400 truncate">
@@ -453,14 +441,14 @@ export default function CasesTable() {
                 <td className="px-3 py-2 text-neutral-500 text-xs whitespace-nowrap">
                   {c.incident_date}
                 </td>
+                <td className="px-3 py-2">
+                  <ChargeCount n={c.charges_number} />
+                </td>
                 <td className="px-3 py-2 text-neutral-400 text-xs truncate">
                   {c.charges}
                 </td>
                 <td className="px-3 py-2">
                   <Stars n={c.rating} />
-                </td>
-                <td className="px-3 py-2">
-                  <ReportCell caseItem={c} onViewPdf={setActiveCase} />
                 </td>
               </tr>
             ))}
