@@ -18,6 +18,7 @@ import { MOCK_CASES } from "@/lib/mockCases";
 import StatusPill from "./StatusPill";
 import Stars from "./Stars";
 import PdfModal from "./PdfModal";
+import ChargesModal from "./ChargesModal";
 
 const COLUMNS = [
   { key: "report_number", label: "Report #", mono: true, width: 215 },
@@ -95,6 +96,7 @@ export default function CasesTable() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [activeCase, setActiveCase] = useState(null);
+  const [activeChargesCase, setActiveChargesCase] = useState(null);
   const [pendingDateFrom, setPendingDateFrom] = useState("");
   const [pendingDateTo, setPendingDateTo] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -427,7 +429,7 @@ export default function CasesTable() {
                   </div>
                 </td>
                 <td className="px-3 py-2">
-                  <span className="flex w-full px-1 py-1 rounded text-xs border border-neutral-700 text-neutral-400 truncate">
+                  <span className="flex w-full justify-center px-1 py-1 rounded text-xs border border-neutral-700 text-neutral-400 truncate">
                     {c.pd}
                   </span>
                 </td>
@@ -440,7 +442,12 @@ export default function CasesTable() {
                   {c.incident_date}
                 </td>
                 <td className="px-3 py-2">
-                  <ChargeCount n={c.charges_number} />
+                  <button
+                    onClick={() => setActiveChargesCase(c)}
+                    className="hover:scale-110 transition-transform duration-150 active:scale-90"
+                  >
+                    <ChargeCount n={c.charges_number} />
+                  </button>
                 </td>
                 <td className="px-3 py-2 text-neutral-400 text-xs truncate">
                   {c.charges}
@@ -504,6 +511,9 @@ export default function CasesTable() {
       </div>
 
       {activeCase && <PdfModal caseItem={activeCase} onClose={() => setActiveCase(null)} />}
+      {activeChargesCase && (
+        <ChargesModal caseItem={activeChargesCase} onClose={() => setActiveChargesCase(null)} />
+      )}
     </div>
   );
 }
