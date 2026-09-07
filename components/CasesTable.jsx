@@ -31,11 +31,10 @@ const COLUMNS = [
   { key: "rating", label: "Rating", width: 110 },
 ];
 
-const TAB_KEYS = ["Open", "Skipped", "Closed"];
+const TAB_KEYS = ["Open", "Closed"];
 const TABS = [
   { key: "all", label: "All" },
   { key: "Open", label: "Open" },
-  { key: "Skipped", label: "Skipped" },
   { key: "Closed", label: "Closed" },
 ];
 
@@ -106,7 +105,6 @@ export default function CasesTable() {
   const [tabCounts, setTabCounts] = useState({
     all: 0,
     Open: 0,
-    Skipped: 0,
     Closed: 0,
   });
   const [loading, setLoading] = useState(true);
