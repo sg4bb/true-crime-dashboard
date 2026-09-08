@@ -60,6 +60,14 @@ export default async function CaseDetailPage({ params }) {
   } else {
     const { data, error } = await supabase.from("cases").select("*").eq("id", id).single();
     console.log("Case fetched, ai_review present:", !!data?.ai_review, "value:", data?.ai_review);
+    console.log(
+      "DEBUG env — URL:",
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      "| anon key last 8 chars:",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.slice(-8),
+      "| VERCEL_ENV:",
+      process.env.VERCEL_ENV
+    );
     if (error || !data) {
       notFound = true;
     } else {
