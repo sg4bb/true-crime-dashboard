@@ -60,37 +60,41 @@ export default function CasePdfViewer({ caseItem }) {
     };
   }, [caseItem]);
 
-  if (loading) {
-    return (
-      <div className="h-[70vh] flex flex-col items-center justify-center gap-2 text-neutral-600 border border-neutral-800 rounded-lg">
-        <Loader2 size={28} className="animate-spin" />
-        <p className="text-sm">Loading PDF...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-[70vh] flex flex-col items-center justify-center gap-2 text-neutral-600 border border-neutral-800 rounded-lg px-8 text-center">
-        <FileText size={32} />
-        <p className="text-sm">{error}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="border border-neutral-800 rounded-lg overflow-hidden">
-      <div className="flex justify-end px-3 py-2 border-b border-neutral-800 bg-neutral-900/60">
-        <a
-          href={url}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-1 text-xs text-amber-400 hover:underline"
-        >
-          Open PDF in new tab <ExternalLink size={11} />
-        </a>
+    <div className="border border-neutral-700 rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-700 bg-neutral-800/50">
+        <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 uppercase tracking-wide">
+          <FileText size={12} /> Incident Report
+        </p>
+        {url && !loading && !error && (
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1 text-xs text-amber-400 hover:underline"
+          >
+            Open PDF in new tab <ExternalLink size={11} />
+          </a>
+        )}
       </div>
-      <iframe src={url} title="Incident report PDF" className="w-full h-[70vh] bg-neutral-950" />
+
+      {loading && (
+        <div className="h-[70vh] flex flex-col items-center justify-center gap-2 text-neutral-600">
+          <Loader2 size={28} className="animate-spin" />
+          <p className="text-sm">Loading PDF...</p>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="h-[70vh] flex flex-col items-center justify-center gap-2 text-neutral-600 px-8 text-center">
+          <FileText size={32} />
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && url && (
+        <iframe src={url} title="Incident report PDF" className="w-full h-[70vh] bg-neutral-950" />
+      )}
     </div>
   );
 }

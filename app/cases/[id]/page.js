@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, FileText } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { MOCK_CASES } from "@/lib/mockCases";
 import StatusPill from "@/components/StatusPill";
@@ -12,27 +12,30 @@ function Field({ label, value }) {
   return (
     <div>
       <p className="text-xs text-neutral-500 mb-0.5">{label}</p>
-      <p className="text-sm text-neutral-200 whitespace-pre-line">{value || "—"}</p>
+      <p className="text-xs text-neutral-200 font-mono whitespace-pre-line">{value || "—"}</p>
     </div>
-  );
-}
-
-function Badge({ children }) {
-  return (
-    <span className="inline-flex px-2 py-0.5 rounded text-xs border border-neutral-700 text-neutral-400">
-      {children}
-    </span>
   );
 }
 
 function Card({ title, children, right }) {
   return (
-    <div className="border border-neutral-800 rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-800 bg-neutral-900/60">
+    <div className="border border-neutral-700 rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-700 bg-neutral-800/50">
         <p className="text-xs font-medium text-neutral-400 uppercase tracking-wide">{title}</p>
         {right}
       </div>
       <div className="p-4">{children}</div>
+    </div>
+  );
+}
+
+function Stat({ label, children }) {
+  return (
+    <div className="flex-1 px-4 py-2.5">
+      <p className="text-[10px] font-semibold text-neutral-500 uppercase tracking-widest mb-1">
+        {label}
+      </p>
+      <div className="text-sm text-neutral-200">{children}</div>
     </div>
   );
 }
@@ -86,56 +89,71 @@ export default async function CaseDetailPage({ params }) {
     <div className="max-w-6xl mx-auto p-6">
       <Link
         href="/"
-        className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-300 mb-4 w-fit"
+        className="group flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/60 -ml-2 px-2 py-1 rounded-md transition-all duration-150 mb-4 w-fit"
       >
-        <ArrowLeft size={12} /> Back to cases
+        <ArrowLeft size={12} className="transition-transform duration-150 group-hover:-translate-x-0.5" />
+        Back to cases
       </Link>
 
       <div className="flex items-start justify-between mb-2">
         <div>
-          <h1 className="text-xl font-semibold text-neutral-100">
+          <h1 className="text-2xl font-bold text-neutral-50 tracking-tight">
             <span className="font-mono">{caseItem.report_number}</span>
             {caseItem.suspect && (
               <span className="text-neutral-500 font-normal"> · {caseItem.suspect}</span>
             )}
           </h1>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <StatusPill status={caseItem.status} />
+          <p className="text-sm text-neutral-500 mt-1">
+            {[caseItem.pd, caseItem.incident_type].filter(Boolean).join(" · ")}
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        {caseItem.pd && <Badge>{caseItem.pd}</Badge>}
-        {caseItem.incident_type && <Badge>{caseItem.incident_type}</Badge>}
-        <div className="flex items-center gap-1">
-          <span className="text-xs text-neutral-600">Rating</span>
-          <Stars n={caseItem.rating} />
-        </div>
+      {/* Stats strip */}
+      <div className="flex items-stretch divide-x divide-neutral-700 border border-neutral-700 rounded-lg bg-neutral-800/30 mb-6 mt-4">
+        <Stat label="Status">
+          <StatusPill status={caseItem.status} />
+        </Stat>
+        <Stat label="Rating">
+          <div className="flex items-center gap-2">
+            <Stars n={caseItem.rating} />
+            {!caseItem.rating && <span className="text-xs text-neutral-500">Ungraded</span>}
+          </div>
+        </Stat>
+        <Stat label="Charge #">{caseItem.charges_number || "—"}</Stat>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Left column: details, charges, notes */}
         <div className="lg:col-span-2 flex flex-col gap-4">
           <Card title="Case Details">
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <Field label="Report #" value={caseItem.report_number} />
-              <Field label="Charge #" value={caseItem.charges_number} />
               <Field label="Agency" value={caseItem.pd} />
               <Field label="Incident Type" value={caseItem.incident_type} />
               <Field label="Incident Date" value={caseItem.incident_date} />
-              <Field label="Location" value={caseItem.incident_location} />
               <Field label="Suspect" value={caseItem.suspect} />
               <Field label="Suspect DOB" value={caseItem.suspect_dob} />
-              <Field label="Officers" value={caseItem.police_officers} />
+              <div className="col-span-2">
+                <Field label="Location" value={caseItem.incident_location} />
+              </div>
+              <div className="col-span-2">
+                <Field label="Officers" value={caseItem.police_officers} />
+              </div>
             </div>
           </Card>
 
           <Card title={`Charges${charges.length ? ` · ${charges.length}` : ""}`}>
             {charges.length > 0 ? (
-              <ul className="flex flex-col gap-2">
+              <ul className="flex flex-col gap-2.5">
                 {charges.map((charge, i) => (
-                  <li key={i} className="text-sm text-neutral-200 border-b border-neutral-900 last:border-0 pb-2 last:pb-0">
+                  <li
+                    key={i}
+                    className="flex items-baseline gap-2.5 text-xs text-neutral-200 font-mono border-b border-neutral-800 last:border-0 pb-2.5 last:pb-0"
+                  >
+                    <span className="text-xs font-semibold text-neutral-600 shrink-0">
+                      {i + 1}
+                    </span>
                     {charge}
                   </li>
                 ))}
@@ -147,14 +165,14 @@ export default async function CaseDetailPage({ params }) {
 
           {caseItem.summary && (
             <Card title="Summary">
-              <p className="text-sm text-neutral-300 whitespace-pre-line leading-relaxed">
+              <p className="text-xs text-neutral-300 font-mono whitespace-pre-line leading-relaxed">
                 {caseItem.summary}
               </p>
             </Card>
           )}
 
           <Card title="Notes">
-            <p className="text-sm text-neutral-300 whitespace-pre-line">
+            <p className="text-xs text-neutral-300 font-mono whitespace-pre-line">
               {caseItem.notes || <span className="text-neutral-600">No notes.</span>}
             </p>
           </Card>
@@ -163,9 +181,6 @@ export default async function CaseDetailPage({ params }) {
         {/* Right column: incident report */}
         <div className="lg:col-span-3">
           <div className="sticky top-6">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 uppercase tracking-wide mb-2">
-              <FileText size={12} /> Incident Report
-            </p>
             <CasePdfViewer caseItem={caseItem} />
           </div>
         </div>
