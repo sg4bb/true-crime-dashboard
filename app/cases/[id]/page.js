@@ -59,6 +59,7 @@ export default async function CaseDetailPage({ params }) {
     caseItem = MOCK_CASES.find((c) => c.id === id) || null;
   } else {
     const { data, error } = await supabase.from("cases").select("*").eq("id", id).single();
+    console.log("Case fetched, ai_review present:", !!data?.ai_review, "value:", data?.ai_review);
     if (error || !data) {
       notFound = true;
     } else {
