@@ -5,6 +5,7 @@ import { MOCK_CASES } from "@/lib/mockCases";
 import StatusPill from "@/components/StatusPill";
 import Stars from "@/components/Stars";
 import CasePdfViewer from "@/components/CasePdfViewer";
+import AIReviewCard from "@/components/AIReviewCard";
 
 export const dynamic = "force-dynamic";
 
@@ -180,8 +181,9 @@ export default async function CaseDetailPage({ params }) {
 
         {/* Right column: incident report */}
         <div className="lg:col-span-3">
-          <div className="sticky top-6">
+          <div className="sticky top-6 flex flex-col gap-4">
             <CasePdfViewer caseItem={caseItem} />
+            <AIReviewCard caseItem={caseItem} />
           </div>
         </div>
       </div>
