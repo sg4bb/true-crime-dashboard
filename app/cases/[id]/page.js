@@ -6,6 +6,7 @@ import StatusPill from "@/components/StatusPill";
 import Stars from "@/components/Stars";
 import CasePdfViewer from "@/components/CasePdfViewer";
 import AIReviewCard from "@/components/AIReviewCard";
+import NotesEditor from "@/components/NotesEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -172,11 +173,7 @@ export default async function CaseDetailPage({ params }) {
             </Card>
           )}
 
-          <Card title="Notes">
-            <p className="text-xs text-neutral-300 font-mono whitespace-pre-line">
-              {caseItem.notes || <span className="text-neutral-600">No notes.</span>}
-            </p>
-          </Card>
+          <NotesEditor caseItem={caseItem} />
         </div>
 
         {/* Right column: incident report */}
