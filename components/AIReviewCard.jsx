@@ -85,9 +85,9 @@ export default function AIReviewCard({ caseItem }) {
         <button
           onClick={handleAnalyze}
           disabled={loading}
-          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md bg-amber-500 text-white hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-800 active:bg-neutral-700 transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 disabled:active:bg-transparent"
         >
-          {loading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} />}
+          {loading && <Loader2 size={12} className="animate-spin" />}
           {review ? "Re-analyse" : "Analyse"}
         </button>
       </div>

@@ -234,7 +234,7 @@ export default function NotesEditor({ caseItem }) {
         {mode === "view" && (
           <button
             onClick={startNewNote}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-md border border-neutral-700 text-neutral-300 hover:bg-neutral-800 transition-all duration-150 active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-800 transition-all duration-150 active:scale-95"
           >
             New note
           </button>
@@ -275,7 +275,7 @@ export default function NotesEditor({ caseItem }) {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md text-neutral-300 border border-neutral-700 hover:bg-neutral-200/10 hover:border-neutral-500 active:bg-neutral-200/20 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:active:scale-100"
+                className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-xl text-neutral-300 border border-neutral-700 hover:bg-neutral-200/10 hover:border-neutral-500 active:bg-neutral-200/20 active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:active:scale-100"
               >
                 {saving && <Loader2 size={12} className="animate-spin" />}
                 Save note

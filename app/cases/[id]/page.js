@@ -91,7 +91,7 @@ export default async function CaseDetailPage({ params }) {
     <div className="max-w-6xl mx-auto p-6">
       <Link
         href="/"
-        className="group flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-200 hover:bg-neutral-800/60 -ml-2 px-2 py-1 rounded-md transition-all duration-150 mb-4 w-fit"
+        className="group flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-100 transition-colors mb-4 w-fit"
       >
         <ArrowLeft size={12} className="transition-transform duration-150 group-hover:-translate-x-0.5" />
         Back to cases
@@ -100,9 +100,9 @@ export default async function CaseDetailPage({ params }) {
       <div className="flex items-start justify-between mb-2">
         <div>
           <h1 className="text-2xl font-bold text-neutral-50 tracking-tight">
-            <span className="font-mono">{caseItem.report_number}</span>
+            <span className="font-mono text-amber-400">{caseItem.report_number}</span>
             {caseItem.suspect && (
-              <span className="text-neutral-500 font-normal"> · {caseItem.suspect}</span>
+              <span className="text-neutral-50 font-normal"><span className="text-neutral-500 font-normal"> · </span>{caseItem.suspect}</span>
             )}
           </h1>
           <p className="text-sm text-neutral-500 mt-1">
@@ -125,7 +125,7 @@ export default async function CaseDetailPage({ params }) {
         <Stat label="Charge #">{caseItem.charges_number || "—"}</Stat>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
         {/* Left column: details, charges, notes */}
         <div className="lg:col-span-2 flex flex-col gap-4">
           <Card title="Case Details">
