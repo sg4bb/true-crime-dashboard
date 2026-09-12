@@ -19,6 +19,7 @@ import StatusPill from "./StatusPill";
 import Stars from "./Stars";
 import PdfModal from "./PdfModal";
 import ChargesModal from "./ChargesModal";
+import DateRangePicker from "./DateRangePicker";
 
 const COLUMNS = [
   { key: "report_number", label: "Report #", mono: true, width: 215 },
@@ -325,20 +326,14 @@ export default function CasesTable() {
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 h-10 bg-neutral-900/80 border border-neutral-800 rounded-lg px-2.5 shadow-sm shadow-black/20">
-          <span className="text-xs text-neutral-500 pl-0.5">From</span>
-          <input
-            type="date"
-            value={pendingDateFrom}
-            onChange={(e) => setPendingDateFrom(e.target.value)}
-            className="[color-scheme:dark] bg-neutral-950/60 border border-neutral-800 rounded-md px-2 py-1 text-xs text-neutral-300 focus:outline-none focus:border-amber-500/50"
-          />
-          <span className="text-xs text-neutral-600">to</span>
-          <input
-            type="date"
-            value={pendingDateTo}
-            onChange={(e) => setPendingDateTo(e.target.value)}
-            className="[color-scheme:dark] bg-neutral-950/60 border border-neutral-800 rounded-md px-2 py-1 text-xs text-neutral-300 focus:outline-none focus:border-amber-500/50"
+        <div className="flex items-center gap-1.5">
+          <DateRangePicker
+            from={pendingDateFrom}
+            to={pendingDateTo}
+            onChange={({ from, to }) => {
+              setPendingDateFrom(from);
+              setPendingDateTo(to);
+            }}
           />
           {(dateFrom || dateTo || pendingDateFrom || pendingDateTo) && (
             <button
