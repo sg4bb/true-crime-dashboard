@@ -127,7 +127,7 @@ export default async function CaseDetailPage({ params }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-6 items-start">
         {/* Left column: details, charges, notes */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
+        <div className="lg:col-span-4 flex flex-col gap-4">
           <Card title="Case Details">
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <Field label="Report #" value={caseItem.report_number} />
@@ -177,7 +177,7 @@ export default async function CaseDetailPage({ params }) {
         </div>
 
         {/* Right column: incident report */}
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-3">
           <div className="sticky top-6 flex flex-col gap-4">
             <CasePdfViewer caseItem={caseItem} />
             <AIReviewCard caseItem={caseItem} />
