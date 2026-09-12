@@ -14,14 +14,14 @@ function Field({ label, value }) {
   return (
     <div>
       <p className="text-xs text-neutral-500 mb-0.5">{label}</p>
-      <p className="text-xs text-neutral-200 font-mono whitespace-pre-line">{value || "—"}</p>
+      <p className="text-xs text-neutral-200 whitespace-pre-line">{value || "—"}</p>
     </div>
   );
 }
 
 function Card({ title, children, right }) {
   return (
-    <div className="border border-neutral-700 rounded-lg overflow-hidden">
+    <div className="border border-neutral-700 rounded-xl overflow-hidden bg-neutral-900">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-700 bg-neutral-800/50">
         <p className="text-xs font-medium text-neutral-400 uppercase tracking-wide">{title}</p>
         {right}
@@ -112,7 +112,7 @@ export default async function CaseDetailPage({ params }) {
       </div>
 
       {/* Stats strip */}
-      <div className="flex items-stretch divide-x divide-neutral-700 border border-neutral-700 rounded-lg bg-neutral-800/30 mb-6 mt-4">
+      <div className="flex items-stretch divide-x divide-neutral-700 border border-neutral-700 rounded-xl bg-neutral-900 mb-6 mt-4">
         <Stat label="Status">
           <StatusPill status={caseItem.status} />
         </Stat>
@@ -125,9 +125,9 @@ export default async function CaseDetailPage({ params }) {
         <Stat label="Charge #">{caseItem.charges_number || "—"}</Stat>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-6 items-start">
         {/* Left column: details, charges, notes */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
+        <div className="lg:col-span-3 flex flex-col gap-4">
           <Card title="Case Details">
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <Field label="Report #" value={caseItem.report_number} />
@@ -151,7 +151,7 @@ export default async function CaseDetailPage({ params }) {
                 {charges.map((charge, i) => (
                   <li
                     key={i}
-                    className="flex items-baseline gap-2.5 text-xs text-neutral-200 font-mono border-b border-neutral-800 last:border-0 pb-2.5 last:pb-0"
+                    className="flex items-baseline gap-2.5 text-xs text-neutral-200 border-b border-neutral-800 last:border-0 pb-2.5 last:pb-0"
                   >
                     <span className="text-xs font-semibold text-neutral-600 shrink-0">
                       {i + 1}
@@ -167,7 +167,7 @@ export default async function CaseDetailPage({ params }) {
 
           {caseItem.summary && (
             <Card title="Summary">
-              <p className="text-xs text-neutral-300 font-mono whitespace-pre-line leading-relaxed">
+              <p className="text-xs text-neutral-300 whitespace-pre-line leading-relaxed">
                 {caseItem.summary}
               </p>
             </Card>
@@ -177,7 +177,7 @@ export default async function CaseDetailPage({ params }) {
         </div>
 
         {/* Right column: incident report */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-4">
           <div className="sticky top-6 flex flex-col gap-4">
             <CasePdfViewer caseItem={caseItem} />
             <AIReviewCard caseItem={caseItem} />

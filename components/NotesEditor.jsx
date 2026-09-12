@@ -226,7 +226,7 @@ export default function NotesEditor({ caseItem }) {
   }
 
   return (
-    <div className="border border-neutral-700 rounded-lg overflow-hidden">
+    <div className="border border-neutral-700 rounded-xl overflow-hidden bg-neutral-900">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-700 bg-neutral-800/50">
         <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 uppercase tracking-wide">
           <NotebookPen size={12} /> Notes

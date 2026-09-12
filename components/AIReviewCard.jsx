@@ -77,7 +77,7 @@ export default function AIReviewCard({ caseItem }) {
   const parsed = review ? formatReview(review) : null;
 
   return (
-    <div className="border border-neutral-700 rounded-lg overflow-hidden">
+    <div className="border border-neutral-700 rounded-xl overflow-hidden bg-neutral-900">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-700 bg-neutral-800/50">
         <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 uppercase tracking-wide">
           <Sparkles size={12} /> AI Review
@@ -110,7 +110,7 @@ export default function AIReviewCard({ caseItem }) {
             <div className="flex items-center gap-2">
               {parsed.verdict && (
                 <span
-                  className={`text-sm font-semibold font-mono ${
+                  className={`text-sm font-semibold ${
                     VERDICT_STYLES[parsed.verdict] || "text-neutral-300"
                   }`}
                 >
@@ -119,7 +119,7 @@ export default function AIReviewCard({ caseItem }) {
               )}
               {parsed.rating && <RatingChip rating={parsed.rating} />}
             </div>
-            <p className="text-xs text-neutral-300 font-mono leading-relaxed">{parsed.reasoning}</p>
+            <p className="text-xs text-neutral-300 leading-relaxed">{parsed.reasoning}</p>
             {generatedAt && (
               <p className="text-[11px] text-neutral-600 mt-1" suppressHydrationWarning>
                 Generated {new Date(generatedAt).toLocaleString()}
