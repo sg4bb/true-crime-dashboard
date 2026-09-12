@@ -3,7 +3,7 @@ import { ArrowLeft, Scale, Gavel, BookOpen } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { MOCK_CASES } from "@/lib/mockCases";
 import StatusPill from "@/components/StatusPill";
-import Stars from "@/components/Stars";
+import RatingInput from "@/components/RatingInput";
 import CasePdfViewer from "@/components/CasePdfViewer";
 import AIReviewCard from "@/components/AIReviewCard";
 import NotesEditor from "@/components/NotesEditor";
@@ -120,10 +120,7 @@ export default async function CaseDetailPage({ params }) {
           <StatusPill status={caseItem.status} />
         </Stat>
         <Stat label="Rating">
-          <div className="flex items-center gap-2">
-            <Stars n={caseItem.rating} />
-            {!caseItem.rating && <span className="text-xs text-neutral-500">Ungraded</span>}
-          </div>
+          <RatingInput caseId={caseItem.id} rating={caseItem.rating} />
         </Stat>
         <Stat label="Charge #">{caseItem.charges_number || "—"}</Stat>
       </div>
