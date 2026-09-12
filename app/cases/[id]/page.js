@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Scale, Gavel, BookOpen } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { MOCK_CASES } from "@/lib/mockCases";
 import StatusPill from "@/components/StatusPill";
@@ -19,11 +19,14 @@ function Field({ label, value }) {
   );
 }
 
-function Card({ title, children, right }) {
+function Card({ title, icon: Icon, children, right }) {
   return (
     <div className="border border-neutral-700 rounded-xl overflow-hidden bg-neutral-900">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-700 bg-neutral-800/50">
-        <p className="text-xs font-medium text-neutral-400 uppercase tracking-wide">{title}</p>
+        <p className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 uppercase tracking-wide">
+          {Icon && <Icon size={12} />}
+          {title}
+        </p>
         {right}
       </div>
       <div className="p-4">{children}</div>
@@ -128,7 +131,7 @@ export default async function CaseDetailPage({ params }) {
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-6 items-start">
         {/* Left column: details, charges, notes */}
         <div className="lg:col-span-4 flex flex-col gap-4">
-          <Card title="Case Details">
+          <Card title="Case Details" icon={Scale}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <Field label="Report #" value={caseItem.report_number} />
               <Field label="Agency" value={caseItem.pd} />
@@ -145,7 +148,7 @@ export default async function CaseDetailPage({ params }) {
             </div>
           </Card>
 
-          <Card title={`Charges${charges.length ? ` · ${charges.length}` : ""}`}>
+          <Card title={`Charges${charges.length ? ` · ${charges.length}` : ""}`} icon={Gavel}>
             {charges.length > 0 ? (
               <ul className="flex flex-col gap-2.5">
                 {charges.map((charge, i) => (
@@ -166,7 +169,7 @@ export default async function CaseDetailPage({ params }) {
           </Card>
 
           {caseItem.summary && (
-            <Card title="Summary">
+            <Card title="Summary" icon={BookOpen}>
               <p className="text-xs text-neutral-300 whitespace-pre-line leading-relaxed">
                 {caseItem.summary}
               </p>
