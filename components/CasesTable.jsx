@@ -261,10 +261,6 @@ export default function CasesTable() {
       )}
 
       <div className="mb-6">
-        <p className="flex items-center gap-2 text-xs font-semibold text-amber-500 uppercase tracking-widest mb-2">
-          <span className="w-3.5 h-px bg-amber-500" />
-          Reviewer Queue
-        </p>
         <h1 className="text-2xl font-bold text-neutral-50 tracking-tight">Cases</h1>
         <p className="text-sm text-neutral-500 mt-1 flex items-center gap-1.5">
           {loading ? (
