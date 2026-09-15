@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, Scale, Gavel, BookOpen } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { MOCK_CASES } from "@/lib/mockCases";
-import StatusPill from "@/components/StatusPill";
+import StatusToggle from "@/components/StatusToggle";
 import RatingInput from "@/components/RatingInput";
 import CasePdfViewer from "@/components/CasePdfViewer";
 import AIReviewCard from "@/components/AIReviewCard";
@@ -117,7 +117,7 @@ export default async function CaseDetailPage({ params }) {
       {/* Stats strip */}
       <div className="flex items-stretch divide-x divide-neutral-700 border border-neutral-700 rounded-xl bg-neutral-900 mb-6 mt-4">
         <Stat label="Status">
-          <StatusPill status={caseItem.status} />
+          <StatusToggle caseId={caseItem.id} status={caseItem.status} />
         </Stat>
         <Stat label="Rating">
           <RatingInput caseId={caseItem.id} rating={caseItem.rating} />
