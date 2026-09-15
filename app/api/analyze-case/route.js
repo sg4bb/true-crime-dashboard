@@ -36,6 +36,52 @@ Summary: ${c.summary || "—"}
 Notes: ${c.notes || "—"}`;
 }
 
+function extractVerdictAndRating(reviewText) {
+  if (!reviewText) return { verdict: null, rating: null };
+  const lines = reviewText.split("\n");
+  const get = (prefix) =>
+    lines.find((l) => l.toLowerCase().startsWith(prefix.toLowerCase()))?.split(":").slice(1).join(":").trim();
+  return { verdict: get("Verdict"), rating: get("Rating") };
+}
+
+// Pulls the most recent human feedback on past AI reviews (from OTHER cases)
+// and formats it as calibration examples for the prompt — this is how
+// reviewer corrections steer future analyses, without any per-user data.
+async function buildFeedbackExamples(excludeCaseId) {
+  const { data: pastCases, error } = await supabaseAdmin
+    .from("cases")
+    .select("incident_type, charges, status, ai_review, ai_review_feedback, ai_review_feedback_note")
+    .not("ai_review_feedback", "is", null)
+    .not("ai_review_feedback_note", "is", null)
+    .neq("ai_review_feedback_note", "")
+    .neq("id", excludeCaseId)
+    .order("ai_review_feedback_at", { ascending: false })
+    .limit(6);
+
+  if (error || !pastCases || pastCases.length === 0) return "";
+
+  const blocks = pastCases.map((c, i) => {
+    const { verdict, rating } = extractVerdictAndRating(c.ai_review);
+    const label = c.ai_review_feedback === "good" ? "Good (correct)" : "Bad (incorrect)";
+    const note = c.ai_review_feedback_note
+      ? ` — reviewer note: "${c.ai_review_feedback_note.slice(0, 200)}"`
+      : "";
+    return `Example ${i + 1}:
+Incident type: ${c.incident_type || "—"} | Charges: ${c.charges || "—"} | Status: ${c.status || "—"}
+AI's original assessment: ${verdict || "—"}, ${rating || "—"}
+Reviewer feedback: ${label}${note}`;
+  });
+
+  return `
+
+Here is feedback from human reviewers on past AI-generated case reviews (from other
+cases, for calibration only). Use it to guide your judgment on the new case below:
+avoid repeating reasoning reviewers flagged as "Bad", and keep applying the reasoning
+patterns they marked "Good".
+
+${blocks.join("\n\n")}`;
+}
+
 export async function POST(request) {
   try {
     const { caseId } = await request.json();
@@ -69,6 +115,9 @@ export async function POST(request) {
       return NextResponse.json({ error: "Case not found." }, { status: 404 });
     }
 
+    const feedbackExamples = await buildFeedbackExamples(caseId);
+    const fullSystemPrompt = SYSTEM_PROMPT + feedbackExamples;
+
     const nvidiaRes = await fetch(
       "https://integrate.api.nvidia.com/v1/chat/completions",
       {
@@ -80,7 +129,7 @@ export async function POST(request) {
         body: JSON.stringify({
           model: process.env.NVIDIA_MODEL || "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
+            { role: "system", content: fullSystemPrompt },
             { role: "user", content: buildCaseSummary(caseItem) },
           ],
           temperature: 0.4,

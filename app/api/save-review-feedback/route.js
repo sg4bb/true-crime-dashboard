@@ -21,6 +21,7 @@ export async function POST(request) {
       .update({
         ai_review_feedback: feedback ?? null,
         ai_review_feedback_note: note ?? null,
+        ai_review_feedback_at: feedback ? new Date().toISOString() : null,
       })
       .eq("id", caseId);
 
