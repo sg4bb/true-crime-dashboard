@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Search,
   Filter,
@@ -402,14 +403,12 @@ export default function CasesTable() {
               <tr key={c.id} className="border-b border-neutral-900 border-l-2 border-l-transparent hover:border-l-amber-500 hover:bg-neutral-800/50 transition-colors duration-150 animate-row-in" style={{ animationDelay: `${Math.min(idx, 20) * 15}ms` }}>
                 <td className="px-3 py-2 font-mono text-xs">
                   <div className="flex items-center gap-3">
-                    <a
+                    <Link
                       href={`/cases/${c.id}`}
-                      target="_blank"
-                      rel="noreferrer"
                       className="text-neutral-400 hover:text-amber-400 hover:underline transition-colors truncate"
                     >
                       {c.report_number}
-                    </a>
+                    </Link>
                     <button
                       onClick={() => setActiveCase(c)}
                       title="View PDF report"
