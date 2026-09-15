@@ -17,6 +17,8 @@ Evaluate the case using these criteria:
 
 Respond in this exact structure, plain text, no markdown symbols:
 
+Summary: <4-7 sentence narrative describing what happened in the incident — who was
+involved, what occurred, when and where, and how officers responded and concluded it>
 Verdict: <Strong candidate / Possible candidate / Weak candidate>
 Rating: <1-5>/5
 Reasoning: <2-4 concise sentences explaining the verdict based on the criteria above>`;
@@ -83,7 +85,7 @@ export async function POST(request) {
           ],
           temperature: 0.4,
           top_p: 0.95,
-          max_tokens: 400,
+          max_tokens: 700,
           reasoning_budget: 512,
         }),
       }
