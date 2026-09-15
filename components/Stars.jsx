@@ -7,7 +7,7 @@ export default function Stars({ n = 0 }) {
         <Star
           key={i}
           size={12}
-          className={i <= n ? "fill-amber-400 text-amber-400" : "text-neutral-700"}
+          className={i <= n ? "text-amber-600" : "text-neutral-700"}
         />
       ))}
     </div>

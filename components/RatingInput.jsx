@@ -46,8 +46,8 @@ export default function RatingInput({ caseId, rating: initialRating }) {
               className={
                 i <= displayValue
                   ? isPreview
-                    ? "fill-amber-400/40 text-amber-400/40"
-                    : "fill-amber-400 text-amber-400"
+                    ? "text-amber-400/40"
+                    : "text-amber-400"
                   : "text-neutral-700"
               }
             />

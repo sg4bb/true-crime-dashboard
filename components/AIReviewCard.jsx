@@ -17,8 +17,8 @@ const RECOMMENDATION_LABEL = {
 };
 
 const RATING_STYLES = {
-  1: "text-neutral-500 border-neutral-700",
-  2: "text-neutral-500 border-neutral-700",
+  1: "text-red-400 border-red-500/30",
+  2: "text-red-400 border-red-500/30",
   3: "text-amber-400 border-amber-500/30",
   4: "text-emerald-400 border-emerald-500/30",
   5: "text-emerald-400 border-emerald-500/30",
