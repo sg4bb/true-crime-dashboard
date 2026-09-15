@@ -20,6 +20,7 @@ import {
   Undo2,
   Redo2,
   Loader2,
+  Trash2,
 } from "lucide-react";
 
 function ToolbarButton({ onClick, active, disabled, title, children }) {
@@ -154,6 +155,8 @@ export default function NotesEditor({ caseItem }) {
   const [mode, setMode] = useState(notes ? "view" : "edit");
   const [visible, setVisible] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState(null);
 
   const editor = useEditor({
@@ -189,6 +192,38 @@ export default function NotesEditor({ caseItem }) {
       editor?.commands.clearContent(true);
       setError(null);
     });
+  }
+
+  function handleDelete() {
+    setShowDeleteConfirm(true);
+  }
+
+  async function confirmDelete() {
+    setShowDeleteConfirm(false);
+    setDeleting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/delete-note", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caseId: caseItem.id }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Couldn't delete the note.");
+        return;
+      }
+      switchMode("edit", () => {
+        setNotes("");
+        setNotesCreatedAt(null);
+        setNotesEditedBy(null);
+        editor?.commands.clearContent(true);
+      });
+    } catch (e) {
+      setError("Couldn't reach the server.");
+    } finally {
+      setDeleting(false);
+    }
   }
 
   async function handleSave() {
@@ -232,12 +267,22 @@ export default function NotesEditor({ caseItem }) {
           <NotebookPen size={12} /> Notes
         </p>
         {mode === "view" && (
-          <button
-            onClick={startNewNote}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-800 transition-all duration-150 active:scale-95"
-          >
-            New note
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+            >
+              {deleting ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+              Delete note
+            </button>
+            <button
+              onClick={startNewNote}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-800 transition-all duration-150 active:scale-95"
+            >
+              New note
+            </button>
+          </div>
         )}
       </div>
 
@@ -279,6 +324,35 @@ export default function NotesEditor({ caseItem }) {
               >
                 {saving && <Loader2 size={12} className="animate-spin" />}
                 Save note
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6 animate-fade-in"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="bg-neutral-900 border border-neutral-700 rounded-xl w-full max-w-sm p-5 animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-sm font-semibold text-neutral-100 mb-1.5">Delete this note?</h3>
+            <p className="text-xs text-neutral-500 mb-4">This can't be undone.</p>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-3 py-1.5 text-xs font-medium rounded-md text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-all duration-150 active:scale-95"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-3 py-1.5 text-xs font-medium rounded-md bg-red-500 text-white hover:bg-red-400 transition-all duration-150 active:scale-95"
+              >
+                Delete
               </button>
             </div>
           </div>
