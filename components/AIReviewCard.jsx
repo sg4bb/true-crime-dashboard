@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Loader2, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Sparkles, Loader2, ThumbsUp, ThumbsDown, RotateCw } from "lucide-react";
 
 const VERDICT_STYLES = {
   "Strong candidate": "text-emerald-400",
@@ -168,8 +168,12 @@ export default function AIReviewCard({ caseItem }) {
           disabled={loading}
           className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-800 active:bg-neutral-700 transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 disabled:active:bg-transparent"
         >
-          {loading && <Loader2 size={12} className="animate-spin" />}
-          {review ? "Re-analyse" : "Analyse"}
+          {loading ? (
+            <Loader2 size={12} className="animate-spin" />
+          ) : (
+            review && <RotateCw size={12} />
+          )}
+          {review ? "Re-run" : "Analyse"}
         </button>
       </div>
 
