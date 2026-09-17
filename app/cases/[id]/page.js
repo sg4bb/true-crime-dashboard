@@ -4,6 +4,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import { MOCK_CASES } from "@/lib/mockCases";
 import StatusToggle from "@/components/StatusToggle";
 import RatingInput from "@/components/RatingInput";
+import MakeRequestButton from "@/components/MakeRequestButton";
 import CasePdfViewer from "@/components/CasePdfViewer";
 import AIReviewCard from "@/components/AIReviewCard";
 import NotesEditor from "@/components/NotesEditor";
@@ -101,13 +102,16 @@ export default async function CaseDetailPage({ params }) {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <Link
-        href="/"
-        className="group flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-100 transition-colors mb-4 w-fit"
-      >
-        <ArrowLeft size={12} className="transition-transform duration-150 group-hover:-translate-x-0.5" />
-        Back to cases
-      </Link>
+      <div className="flex items-center justify-between mb-4">
+        <Link
+          href="/"
+          className="group flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-100 transition-colors w-fit"
+        >
+          <ArrowLeft size={12} className="transition-transform duration-150 group-hover:-translate-x-0.5" />
+          Back to cases
+        </Link>
+        <MakeRequestButton caseItem={caseItem} />
+      </div>
 
       <div className="flex items-start justify-between mb-2">
         <div>
