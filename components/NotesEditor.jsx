@@ -21,6 +21,7 @@ import {
   Redo2,
   Loader2,
   Trash2,
+  Plus,
 } from "lucide-react";
 
 function ToolbarButton({ onClick, active, disabled, title, children }) {
@@ -280,6 +281,7 @@ export default function NotesEditor({ caseItem }) {
               onClick={startNewNote}
               className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-xl border border-neutral-700 text-neutral-300 hover:bg-neutral-800 transition-all duration-150 active:scale-95"
             >
+              <Plus size={12} />
               New note
             </button>
           </div>
