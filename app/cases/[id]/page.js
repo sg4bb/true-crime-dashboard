@@ -50,7 +50,16 @@ function chargesList(charges) {
   return charges
     .split(/\n|;/)
     .map((c) => c.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((raw) => {
+      const parts = raw.split("++").map((p) => p.trim());
+      if (parts.length === 1) {
+        // No "++" delimiter found — legacy free-text charge, show as-is.
+        return { title: parts[0], code: null, degree: null, disposition: null };
+      }
+      const [title, code, degree, disposition] = parts;
+      return { title, code: code || null, degree: degree || null, disposition: disposition || null };
+    });
 }
 
 export default async function CaseDetailPage({ params }) {
@@ -156,7 +165,17 @@ export default async function CaseDetailPage({ params }) {
                     <span className="text-xs font-semibold text-neutral-600 shrink-0">
                       {i + 1}
                     </span>
-                    {charge}
+                    <div>
+                      <p className="font-semibold text-neutral-100">{charge.title}</p>
+                      {(charge.code || charge.degree || charge.disposition) && (
+                        <p className="text-[11px] text-neutral-500 font-mono mt-0.5">
+                          {[charge.code, charge.degree].filter(Boolean).join("  ")}
+                          {charge.disposition &&
+                            (charge.code || charge.degree ? "  ·  " : "")}
+                          {charge.disposition}
+                        </p>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>
