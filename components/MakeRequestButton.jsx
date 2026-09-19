@@ -185,7 +185,7 @@ export default function MakeRequestButton({ caseItem }) {
                 className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-xl text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <RefreshCw size={12} className={rerunning ? "animate-spin" : ""} />
-                {rerunning ? "Re-running…" : "Re-Run"}
+                {rerunning ? "Re-running…" : "Re-run"}
               </button>
             </div>
           </div>
