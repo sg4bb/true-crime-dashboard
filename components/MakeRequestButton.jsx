@@ -1,16 +1,24 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Mail, Loader2, Copy, Check, X, Bug } from "lucide-react";
+import { Mail, Loader2, Copy, Check, X } from "lucide-react";
 import ErrorToast from "./ErrorToast";
 
 export default function MakeRequestButton({ caseItem }) {
   const [loading, setLoading] = useState(false);
-  const [letter, setLetter] = useState(null);
+  const [subject, setSubject] = useState(caseItem.request_subject || null);
+  const [letter, setLetter] = useState(caseItem.request_letter || null);
+  const [showModal, setShowModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const toastRef = useRef(null);
 
   async function handleClick() {
+    // Already generated for this case: just show it, no new AI call.
+    if (subject && letter) {
+      setShowModal(true);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch("/api/generate-request-letter", {
@@ -22,7 +30,9 @@ export default function MakeRequestButton({ caseItem }) {
       if (!res.ok) {
         toastRef.current?.trigger();
       } else {
+        setSubject(data.subject);
         setLetter(data.letter);
+        setShowModal(true);
       }
     } catch (e) {
       toastRef.current?.trigger();
@@ -33,7 +43,7 @@ export default function MakeRequestButton({ caseItem }) {
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(letter);
+      await navigator.clipboard.writeText(`Subject: ${subject}\n\n${letter}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (e) {
@@ -56,20 +66,12 @@ export default function MakeRequestButton({ caseItem }) {
           )}
           Make Request
         </button>
-
-        <button
-          onClick={() => toastRef.current?.trigger()}
-          title="Test error toast"
-          className="flex items-center justify-center w-7 h-7 rounded-full text-neutral-500 hover:text-red-400 hover:bg-neutral-800/70 transition-all duration-150 active:scale-95"
-        >
-          <Bug size={13} />
-        </button>
       </div>
 
-      {letter && (
+      {showModal && (
         <div
           className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6 animate-fade-in"
-          onClick={() => setLetter(null)}
+          onClick={() => setShowModal(false)}
         >
           <div
             className="bg-neutral-900 border border-neutral-700 rounded-xl w-full max-w-2xl max-h-[85vh] flex flex-col animate-scale-in"
@@ -78,20 +80,32 @@ export default function MakeRequestButton({ caseItem }) {
             <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-700 shrink-0">
               <p className="text-sm font-medium text-neutral-100">Public Records Request</p>
               <button
-                onClick={() => setLetter(null)}
+                onClick={() => setShowModal(false)}
                 className="text-neutral-500 hover:text-neutral-300 transition-colors"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4">
-              <textarea
-                value={letter}
-                onChange={(e) => setLetter(e.target.value)}
-                rows={20}
-                className="w-full h-full min-h-[400px] bg-neutral-950/60 border border-neutral-800 rounded-md px-3 py-2.5 text-xs text-neutral-200 leading-relaxed focus:outline-none focus:border-amber-500/50 resize-none"
-              />
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              <div>
+                <p className="text-xs text-neutral-500 mb-1">Subject</p>
+                <input
+                  value={subject || ""}
+                  onChange={(e) => setSubject(e.target.value)}
+                  className="w-full bg-neutral-950/60 border border-neutral-800 rounded-md px-3 py-2 text-xs text-neutral-200 focus:outline-none focus:border-amber-500/50"
+                />
+              </div>
+
+              <div className="flex flex-col flex-1 min-h-0">
+                <p className="text-xs text-neutral-500 mb-1">Letter</p>
+                <textarea
+                  value={letter || ""}
+                  onChange={(e) => setLetter(e.target.value)}
+                  rows={18}
+                  className="w-full min-h-[380px] bg-neutral-950/60 border border-neutral-800 rounded-md px-3 py-2.5 text-xs text-neutral-200 leading-relaxed focus:outline-none focus:border-amber-500/50 resize-none"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-neutral-800 shrink-0">

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const LETTER_TEMPLATE = `Subject: Public Records Request - [Suspect Name / Incident Type] - [Incident Date]
 
@@ -71,6 +71,32 @@ Charges: ${c.charges || "—"}
 Summary: ${c.summary || "—"}`;
 }
 
+// Splits the raw AI output into { subject, body }: subject is the first
+// "Subject: ..." line, body is everything after it, trimmed to end right
+// after "Best Regards" (defensive against trailing AI commentary).
+function parseLetterResponse(raw) {
+  const text = raw.trim();
+  const lines = text.split("\n");
+
+  let subject = "";
+  let bodyStartIndex = 0;
+
+  const subjectLineIndex = lines.findIndex((l) => l.trim().toLowerCase().startsWith("subject:"));
+  if (subjectLineIndex !== -1) {
+    subject = lines[subjectLineIndex].trim().replace(/^subject:\s*/i, "").trim();
+    bodyStartIndex = subjectLineIndex + 1;
+  }
+
+  let body = lines.slice(bodyStartIndex).join("\n").trim();
+
+  const bestRegardsMatch = body.match(/([\s\S]*Best Regards)/i);
+  if (bestRegardsMatch) {
+    body = bestRegardsMatch[1].trim();
+  }
+
+  return { subject, body };
+}
+
 export async function POST(request) {
   try {
     const { caseId } = await request.json();
@@ -79,15 +105,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing caseId" }, { status: 400 });
     }
 
-    const apiKey = process.env.NVIDIA_API_KEY;
-    if (!apiKey) {
+    if (!supabaseAdmin) {
       return NextResponse.json(
-        { error: "Server isn't configured with NVIDIA_API_KEY yet." },
+        { error: "Server isn't configured with SUPABASE_SERVICE_ROLE_KEY yet." },
         { status: 500 }
       );
     }
 
-    const { data: caseItem, error: fetchError } = await supabase
+    const { data: caseItem, error: fetchError } = await supabaseAdmin
       .from("cases")
       .select("*")
       .eq("id", caseId)
@@ -95,6 +120,25 @@ export async function POST(request) {
 
     if (fetchError || !caseItem) {
       return NextResponse.json({ error: "Case not found." }, { status: 404 });
+    }
+
+    // Already generated for this case: return the stored version and never
+    // call the AI again for it.
+    if (caseItem.request_subject && caseItem.request_letter) {
+      return NextResponse.json({
+        subject: caseItem.request_subject,
+        letter: caseItem.request_letter,
+        generatedAt: caseItem.request_generated_at,
+        cached: true,
+      });
+    }
+
+    const apiKey = process.env.NVIDIA_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "Server isn't configured with NVIDIA_API_KEY yet." },
+        { status: 500 }
+      );
     }
 
     const nvidiaRes = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
@@ -127,13 +171,30 @@ export async function POST(request) {
 
     const nvidiaData = await nvidiaRes.json();
     const message = nvidiaData?.choices?.[0]?.message;
-    const letter = (message?.content || message?.reasoning_content || "").trim();
+    const rawLetter = (message?.content || message?.reasoning_content || "").trim();
 
-    if (!letter) {
+    if (!rawLetter) {
       return NextResponse.json({ error: "Empty response from AI provider." }, { status: 502 });
     }
 
-    return NextResponse.json({ letter });
+    const { subject, body } = parseLetterResponse(rawLetter);
+    const generatedAt = new Date().toISOString();
+
+    const { error: updateError } = await supabaseAdmin
+      .from("cases")
+      .update({
+        request_subject: subject,
+        request_letter: body,
+        request_generated_at: generatedAt,
+      })
+      .eq("id", caseId);
+
+    if (updateError) {
+      console.error("Error saving request letter:", updateError);
+      // Still return the letter even if it couldn't be saved.
+    }
+
+    return NextResponse.json({ subject, letter: body, generatedAt, cached: false });
   } catch (err) {
     console.error("generate-request-letter error:", err);
     return NextResponse.json({ error: "Unexpected server error." }, { status: 500 });
