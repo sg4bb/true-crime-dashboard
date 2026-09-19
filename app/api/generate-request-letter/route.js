@@ -99,7 +99,7 @@ function parseLetterResponse(raw) {
 
 export async function POST(request) {
   try {
-    const { caseId } = await request.json();
+    const { caseId, force } = await request.json();
 
     if (!caseId) {
       return NextResponse.json({ error: "Missing caseId" }, { status: 400 });
@@ -123,8 +123,8 @@ export async function POST(request) {
     }
 
     // Already generated for this case: return the stored version and never
-    // call the AI again for it.
-    if (caseItem.request_subject && caseItem.request_letter) {
+    // call the AI again for it — unless a re-run was explicitly requested.
+    if (!force && caseItem.request_subject && caseItem.request_letter) {
       return NextResponse.json({
         subject: caseItem.request_subject,
         letter: caseItem.request_letter,

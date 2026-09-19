@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Mail, Loader2, Copy, Check, X, Pencil, Eye } from "lucide-react";
+import { Mail, Loader2, Copy, Check, X, Pencil, Eye, RefreshCw } from "lucide-react";
 import ErrorToast from "./ErrorToast";
 
 export default function MakeRequestButton({ caseItem }) {
@@ -11,6 +11,7 @@ export default function MakeRequestButton({ caseItem }) {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [rerunning, setRerunning] = useState(false);
   const toastRef = useRef(null);
 
   async function handleClick() {
@@ -39,6 +40,29 @@ export default function MakeRequestButton({ caseItem }) {
       toastRef.current?.trigger();
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleRerun() {
+    setRerunning(true);
+    try {
+      const res = await fetch("/api/generate-request-letter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caseId: caseItem.id, force: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toastRef.current?.trigger();
+      } else {
+        setSubject(data.subject);
+        setLetter(data.letter);
+        setEditing(false);
+      }
+    } catch (e) {
+      toastRef.current?.trigger();
+    } finally {
+      setRerunning(false);
     }
   }
 
@@ -154,8 +178,16 @@ export default function MakeRequestButton({ caseItem }) {
               </div>
             </div>
 
-            {/* Button row intentionally left empty for now. */}
-            <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-neutral-800 shrink-0 min-h-[52px]" />
+            <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-neutral-800 shrink-0 min-h-[52px]">
+              <button
+                onClick={handleRerun}
+                disabled={rerunning}
+                className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-xl text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <RefreshCw size={12} className={rerunning ? "animate-spin" : ""} />
+                {rerunning ? "Re-running…" : "Re-Run"}
+              </button>
+            </div>
           </div>
         </div>
       )}
