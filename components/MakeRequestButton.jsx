@@ -1,28 +1,17 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Mail, Loader2, Copy, Check, X, AlertTriangle } from "lucide-react";
+import { useState, useRef } from "react";
+import { Mail, Loader2, Copy, Check, X, Bug } from "lucide-react";
+import ErrorToast from "./ErrorToast";
 
 export default function MakeRequestButton({ caseItem }) {
   const [loading, setLoading] = useState(false);
-  const [showErrorToast, setShowErrorToast] = useState(false);
   const [letter, setLetter] = useState(null);
   const [copied, setCopied] = useState(false);
-  const toastTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    return () => clearTimeout(toastTimeoutRef.current);
-  }, []);
-
-  function triggerErrorToast() {
-    clearTimeout(toastTimeoutRef.current);
-    setShowErrorToast(true);
-    toastTimeoutRef.current = setTimeout(() => setShowErrorToast(false), 4000);
-  }
+  const toastRef = useRef(null);
 
   async function handleClick() {
     setLoading(true);
-    setShowErrorToast(false);
     try {
       const res = await fetch("/api/generate-request-letter", {
         method: "POST",
@@ -31,12 +20,12 @@ export default function MakeRequestButton({ caseItem }) {
       });
       const data = await res.json();
       if (!res.ok) {
-        triggerErrorToast();
+        toastRef.current?.trigger();
       } else {
         setLetter(data.letter);
       }
     } catch (e) {
-      triggerErrorToast();
+      toastRef.current?.trigger();
     } finally {
       setLoading(false);
     }
@@ -54,18 +43,28 @@ export default function MakeRequestButton({ caseItem }) {
 
   return (
     <>
-      <button
-        onClick={handleClick}
-        disabled={loading}
-        className="flex items-center gap-3 px-3 py-1.5 text-xs rounded-full bg-zinc-800 text-amber-400 hover:bg-neutral-800/70 transition-all duration-150 active:scale-95 active:bg-neutral-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
-      >
-        {loading ? (
-          <Loader2 size={13} className="animate-spin text-neutral-400" />
-        ) : (
-          <Mail size={13} className="text-amber-400" />
-        )}
-        Make Request
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={handleClick}
+          disabled={loading}
+          className="flex items-center gap-3 px-3 py-1.5 text-xs rounded-full bg-zinc-800 text-amber-400 hover:bg-neutral-800/70 transition-all duration-150 active:scale-95 active:bg-neutral-800 disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
+        >
+          {loading ? (
+            <Loader2 size={13} className="animate-spin text-neutral-400" />
+          ) : (
+            <Mail size={13} className="text-amber-400" />
+          )}
+          Make Request
+        </button>
+
+        <button
+          onClick={() => toastRef.current?.trigger()}
+          title="Test error toast"
+          className="flex items-center justify-center w-7 h-7 rounded-full text-neutral-500 hover:text-red-400 hover:bg-neutral-800/70 transition-all duration-150 active:scale-95"
+        >
+          <Bug size={13} />
+        </button>
+      </div>
 
       {letter && (
         <div
@@ -98,7 +97,7 @@ export default function MakeRequestButton({ caseItem }) {
             <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-neutral-800 shrink-0">
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-amber-600 text-white hover:bg-amber-500 transition-all duration-150 active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-amber-500 text-neutral-950 hover:bg-amber-400 transition-all duration-150 active:scale-95"
               >
                 {copied ? <Check size={13} /> : <Copy size={13} />}
                 {copied ? "Copied" : "Copy"}
@@ -108,30 +107,7 @@ export default function MakeRequestButton({ caseItem }) {
         </div>
       )}
 
-      {showErrorToast && (
-        <div className="fixed bottom-5 right-5 z-[60] w-full max-w-sm animate-fade-in-up">
-          <div className="relative overflow-hidden rounded-xl bg-amber-600 shadow-lg shadow-black/30">
-            <button
-              onClick={() => setShowErrorToast(false)}
-              className="absolute top-2.5 right-2.5 text-white/70 hover:text-white transition-colors"
-            >
-              <X size={14} />
-            </button>
-            <div className="flex items-start gap-3 px-4 py-3.5 pr-8">
-              <AlertTriangle size={18} className="text-white shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-white">Oops!</p>
-                <p className="text-xs text-white/90 mt-0.5">
-                  The server returned an error; please try again.
-                </p>
-              </div>
-            </div>
-            <div className="h-1 bg-white/25 w-full">
-              <div className="h-full bg-white/70 animate-toast-shrink" />
-            </div>
-          </div>
-        </div>
-      )}
+      <ErrorToast ref={toastRef} />
     </>
   );
 }

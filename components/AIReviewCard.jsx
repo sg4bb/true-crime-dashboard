@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Sparkles, Loader2, ThumbsUp, ThumbsDown, RefreshCcw } from "lucide-react";
+import ErrorToast from "./ErrorToast";
 
 const VERDICT_STYLES = {
   "Strong candidate": "text-emerald-400",
@@ -130,11 +131,10 @@ export default function AIReviewCard({ caseItem }) {
   const [review, setReview] = useState(caseItem.ai_review || null);
   const [generatedAt, setGeneratedAt] = useState(caseItem.ai_review_generated_at || null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const toastRef = useRef(null);
 
   async function handleAnalyze() {
     setLoading(true);
-    setError(null);
     try {
       const res = await fetch("/api/analyze-case", {
         method: "POST",
@@ -143,13 +143,13 @@ export default function AIReviewCard({ caseItem }) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Something went wrong.");
+        toastRef.current?.trigger();
       } else {
         setReview(data.review);
         setGeneratedAt(data.generatedAt);
       }
     } catch (e) {
-      setError("Couldn't reach the server.");
+      toastRef.current?.trigger();
     } finally {
       setLoading(false);
     }
@@ -178,9 +178,7 @@ export default function AIReviewCard({ caseItem }) {
       </div>
 
       <div className="p-4">
-        {error && <p className="text-sm text-red-400 mb-2">{error}</p>}
-
-        {!review && !loading && !error && (
+        {!review && !loading && (
           <p className="text-sm text-neutral-600">No AI review stored for this case yet.</p>
         )}
 
@@ -229,6 +227,8 @@ export default function AIReviewCard({ caseItem }) {
           </div>
         )}
       </div>
+
+      <ErrorToast ref={toastRef} />
     </div>
   );
 }
