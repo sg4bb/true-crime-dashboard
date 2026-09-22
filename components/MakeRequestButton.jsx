@@ -138,26 +138,26 @@ export default function MakeRequestButton({ caseItem }) {
                 <input
                   value={subject || ""}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full bg-neutral-950/60 border border-neutral-800 rounded-md px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-amber-500/50"
+                  className="w-full bg-neutral-950/60 border border-neutral-800 rounded-xl px-3 py-2 text-sm text-neutral-200 focus:outline-none focus:border-amber-500/50"
                 />
               </div>
 
               <div className="flex flex-col flex-1 min-h-0">
                 <div className="flex items-center justify-between mb-1.5">
                   <p className="text-xs font-medium text-neutral-400">Letter</p>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-5">
                     <button
                       onClick={handleCopy}
-                      className="flex items-center gap-1 text-xs text-neutral-400 hover:text-amber-400 transition-colors"
+                      className="flex items-center gap-1 text-[11px] text-neutral-400 hover:text-amber-400 transition-all duration-150 active:scale-90"
                     >
-                      {copied ? <Check size={12} /> : <Copy size={12} />}
+                      {copied ? <Check size={10} /> : <Copy size={10} />}
                       {copied ? "Copied" : "Copy letter"}
                     </button>
                     <button
                       onClick={() => setEditing((v) => !v)}
-                      className="flex items-center gap-1 text-xs text-neutral-400 hover:text-amber-400 transition-colors"
+                      className="flex items-center gap-1 text-[11px] text-neutral-400 hover:text-amber-400 transition-all duration-150 active:scale-90"
                     >
-                      {editing ? <Eye size={12} /> : <Pencil size={12} />}
+                      {editing ? <Eye size={10} /> : <Pencil size={10} />}
                       {editing ? "Preview" : "Edit text"}
                     </button>
                   </div>
@@ -168,10 +168,10 @@ export default function MakeRequestButton({ caseItem }) {
                     onChange={(e) => setLetter(e.target.value)}
                     rows={18}
                     autoFocus
-                    className="w-full min-h-[380px] bg-neutral-950/60 border border-amber-500/40 rounded-md px-3 py-2.5 text-xs text-neutral-200 leading-relaxed focus:outline-none resize-none"
+                    className="w-full min-h-[380px] bg-neutral-950/60 border border-amber-500/40 rounded-xl px-3 py-2.5 text-xs text-neutral-200 leading-relaxed focus:outline-none resize-none"
                   />
                 ) : (
-                  <div className="min-h-[380px] bg-neutral-950/60 border border-neutral-800 rounded-md px-3 py-2.5 text-xs text-neutral-300 leading-relaxed whitespace-pre-line">
+                  <div className="min-h-[380px] bg-neutral-950/60 border border-neutral-800 rounded-xl px-3 py-2.5 text-xs text-neutral-300 leading-relaxed whitespace-pre-line">
                     {letter}
                   </div>
                 )}
@@ -182,10 +182,10 @@ export default function MakeRequestButton({ caseItem }) {
               <button
                 onClick={handleRerun}
                 disabled={rerunning}
-                className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-xl text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800 transition-all duration-150 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <RefreshCw size={12} className={rerunning ? "animate-spin" : ""} />
-                {rerunning ? "Re-running…" : "Re-run"}
+                {rerunning ? "Re-running…" : "Re-Run"}
               </button>
             </div>
           </div>
