@@ -112,11 +112,9 @@ export default function MakeRequestButton({ caseItem }) {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-neutral-100">Public Records Request</p>
-                  <p className="flex items-center gap-1.5 text-xs text-neutral-500 mt-0.5">
+                  <p className="flex items-center gap-1.5 text-[10px] text-neutral-500 mt-0.5">
                     <span>
-                      {[caseItem.report_number, caseItem.suspect, caseItem.pd]
-                        .filter(Boolean)
-                        .join(" · ")}
+                      {[caseItem.report_number, caseItem.suspect].filter(Boolean).join(" · ")}
                     </span>
                   </p>
                 </div>
