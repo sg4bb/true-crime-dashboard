@@ -54,7 +54,10 @@ function ChargeCount({ n }) {
 
 // --- Test mode: filters/sorts/paginates the MOCK_CASES array in memory ---
 function runMockQuery({ tab, query, sortKey, sortDir, page, pageSize, dateFrom, dateTo }) {
-  let rows = MOCK_CASES.filter((c) => (tab === "all" ? true : c.status === tab));
+  let rows = MOCK_CASES.filter((c) => (tab === "all" ? true : c.status === tab)).map((c) => ({
+    ...c,
+    agencies: c.agencies || (c.pd ? { name: c.pd } : null),
+  }));
 
   if (query.trim()) {
     const q = query.toLowerCase();
@@ -190,26 +193,62 @@ export default function CasesTable() {
         return;
       }
 
-      let q = supabase.from("cases").select("*", { count: "exact" });
+      // Ordering by a related table's column only reorders the parent
+      // table (cases) if the embed uses !inner — but !inner also turns it
+      // into an inner join, hiding cases with no agency_id. So only use it
+      // while actively sorting by Agency, and only for the row/pagination
+      // query — never for the total count (below), so the header total
+      // stays accurate regardless of which column is sorted.
+      const agenciesEmbed = sortKey === "pd" ? "agencies!inner(id, name)" : "agencies(id, name)";
+      let q = supabase.from("cases").select(`*, ${agenciesEmbed}`, { count: "exact" });
+      let countQ = supabase.from("cases").select("id", { count: "exact", head: true });
 
-      if (tab !== "all") q = q.eq("status", tab);
+      if (tab !== "all") {
+        q = q.eq("status", tab);
+        countQ = countQ.eq("status", tab);
+      }
 
       if (debouncedQuery.trim()) {
         const term = `%${debouncedQuery.trim()}%`;
-        q = q.or(
-          `report_number.ilike.${term},suspect.ilike.${term},charges.ilike.${term},incident_type.ilike.${term},pd.ilike.${term}`
-        );
+        let orFilter = `report_number.ilike.${term},suspect.ilike.${term},charges.ilike.${term},incident_type.ilike.${term}`;
+
+        // "pd" isn't a column on cases anymore — resolve matching agencies by
+        // name first, then filter cases by their agency_id.
+        const { data: matchingAgencies } = await supabase
+          .from("agencies")
+          .select("id")
+          .ilike("name", term);
+        const agencyIds = (matchingAgencies || []).map((a) => a.id);
+        if (agencyIds.length > 0) {
+          orFilter += `,agency_id.in.(${agencyIds.join(",")})`;
+        }
+
+        q = q.or(orFilter);
+        countQ = countQ.or(orFilter);
       }
 
-      if (dateFrom) q = q.gte("incident_date", dateFrom);
-      if (dateTo) q = q.lte("incident_date", dateTo);
+      if (dateFrom) {
+        q = q.gte("incident_date", dateFrom);
+        countQ = countQ.gte("incident_date", dateFrom);
+      }
+      if (dateTo) {
+        q = q.lte("incident_date", dateTo);
+        countQ = countQ.lte("incident_date", dateTo);
+      }
 
-      q = q.order(sortKey, { ascending: sortDir === "asc", nullsFirst: false });
+      if (sortKey === "pd") {
+        q = q.order("agencies(name)", { ascending: sortDir === "asc", nullsFirst: false });
+      } else {
+        q = q.order(sortKey, { ascending: sortDir === "asc", nullsFirst: false });
+      }
 
       const from = (page - 1) * pageSize;
       q = q.range(from, from + pageSize - 1);
 
-      const { data, error, count } = await q;
+      const [{ data, error }, { count: accurateCount, error: countError }] = await Promise.all([
+        q,
+        countQ,
+      ]);
 
       if (!active) return;
 
@@ -220,7 +259,7 @@ export default function CasesTable() {
         setTotalCount(0);
       } else {
         setRows(data || []);
-        setTotalCount(count || 0);
+        setTotalCount(countError ? 0 : accurateCount || 0);
       }
       setLoading(false);
     }
@@ -420,7 +459,7 @@ export default function CasesTable() {
                 </td>
                 <td className="px-3 py-2">
                   <span className="flex w-full px-1 py-1 rounded text-xs border border-neutral-700 text-neutral-400 truncate">
-                    {c.pd || "ㅤ"}
+                    {c.agencies?.name || "ㅤ"}
                   </span>
                 </td>
                 <td className="px-3 py-2 text-neutral-200 truncate">{c.suspect}</td>

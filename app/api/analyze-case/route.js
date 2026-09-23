@@ -25,7 +25,7 @@ Reasoning: <2-4 concise sentences explaining the verdict based on the criteria a
 
 function buildCaseSummary(c) {
   return `Report #: ${c.report_number || "—"}
-Agency: ${c.pd || "—"}
+Agency: ${c.agencies?.name || "—"}
 Incident type: ${c.incident_type || "—"}
 Incident date: ${c.incident_date || "—"}
 Location: ${c.incident_location || "—"}
@@ -107,7 +107,7 @@ export async function POST(request) {
 
     const { data: caseItem, error: fetchError } = await supabaseAdmin
       .from("cases")
-      .select("*")
+      .select("*, agencies(name)")
       .eq("id", caseId)
       .single();
 

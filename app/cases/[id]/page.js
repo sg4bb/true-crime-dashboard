@@ -70,9 +70,14 @@ export default async function CaseDetailPage({ params }) {
   let notFound = false;
 
   if (!isSupabaseConfigured) {
-    caseItem = MOCK_CASES.find((c) => c.id === id) || null;
+    const mock = MOCK_CASES.find((c) => c.id === id) || null;
+    caseItem = mock && { ...mock, agencies: mock.agencies || (mock.pd ? { name: mock.pd } : null) };
   } else {
-    const { data, error } = await supabase.from("cases").select("*").eq("id", id).single();
+    const { data, error } = await supabase
+      .from("cases")
+      .select("*, agencies(name)")
+      .eq("id", id)
+      .single();
     if (error || !data) {
       notFound = true;
     } else {
@@ -122,7 +127,7 @@ export default async function CaseDetailPage({ params }) {
             )}
           </h1>
           <p className="text-sm text-neutral-500 mt-1">
-            {[caseItem.pd, caseItem.incident_type].filter(Boolean).join(" · ")}
+            {[caseItem.agencies?.name, caseItem.incident_type].filter(Boolean).join(" · ")}
           </p>
         </div>
       </div>
@@ -144,7 +149,7 @@ export default async function CaseDetailPage({ params }) {
           <Card title="Case Details" icon={Scale}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <Field label="Report #" value={caseItem.report_number} />
-              <Field label="Agency" value={caseItem.pd} />
+              <Field label="Agency" value={caseItem.agencies?.name} />
               <Field label="Incident Type" value={caseItem.incident_type} />
               <Field label="Incident Date" value={caseItem.incident_date} />
               <Field label="Suspect" value={caseItem.suspect} />
