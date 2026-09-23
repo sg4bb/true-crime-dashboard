@@ -1,8 +1,66 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Mail, Loader2, Copy, Check, X, Pencil, Eye, RefreshCw } from "lucide-react";
+import { Mail, Loader2, Copy, Check, X, Pencil, Eye, RefreshCw, Building2, ExternalLink, Download } from "lucide-react";
 import ErrorToast from "./ErrorToast";
+
+const primaryBtn =
+  "flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium rounded-md bg-amber-500 text-neutral-950 hover:bg-amber-400 transition-all duration-150 active:scale-95";
+const secondaryBtn =
+  "flex items-center gap-1.5 px-2.5 py-1.5 text-[11px] font-medium rounded-md border border-neutral-700 text-neutral-300 hover:bg-neutral-800 transition-all duration-150 active:scale-95";
+
+function AgencyAction({ agency }) {
+  if (!agency || !agency.method) {
+    return <span className="text-[11px] text-neutral-600 italic">No FOIA method on file</span>;
+  }
+
+  if (agency.method === "portal" && agency.portal_url) {
+    return (
+      <a href={agency.portal_url} target="_blank" rel="noopener noreferrer" className={primaryBtn}>
+        Open FOIA Portal
+        <ExternalLink size={11} />
+      </a>
+    );
+  }
+
+  if (agency.method === "email" && agency.email) {
+    return (
+      <a href={`mailto:${agency.email}`} className={primaryBtn}>
+        Email Request
+        <Mail size={11} />
+      </a>
+    );
+  }
+
+  if (agency.method === "form" && agency.email) {
+    return (
+      <div className="flex items-center gap-2">
+        <a href={`mailto:${agency.email}`} className={primaryBtn}>
+          Email Request
+          <Mail size={11} />
+        </a>
+        {agency.form_url && (
+          <a href={agency.form_url} target="_blank" rel="noopener noreferrer" className={secondaryBtn}>
+            Download Form
+            <Download size={11} />
+          </a>
+        )}
+      </div>
+    );
+  }
+
+  if (agency.method === "in_person") {
+    return (
+      <span className="text-[11px] text-neutral-500 text-right max-w-[220px]">
+        Request must be made in person
+        {agency.address ? ` at ${agency.address}` : ""}
+        {agency.phone ? ` or by calling ${agency.phone}` : ""}.
+      </span>
+    );
+  }
+
+  return <span className="text-[11px] text-neutral-600 italic">No FOIA method on file</span>;
+}
 
 export default function MakeRequestButton({ caseItem }) {
   const [loading, setLoading] = useState(false);
@@ -131,6 +189,16 @@ export default function MakeRequestButton({ caseItem }) {
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              <div className="flex items-center justify-between gap-3 bg-neutral-950/60 border border-neutral-800 rounded-xl px-3.5 py-2.5">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Building2 size={14} className="text-neutral-500 shrink-0" />
+                  <span className="text-xs text-neutral-300 truncate">
+                    {caseItem.agencies?.name || "No agency on file"}
+                  </span>
+                </div>
+                <AgencyAction agency={caseItem.agencies} />
+              </div>
+
               <div>
                 <p className="text-xs font-medium text-neutral-400 mb-1.5">Subject</p>
                 <input

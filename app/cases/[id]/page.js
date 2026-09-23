@@ -75,7 +75,7 @@ export default async function CaseDetailPage({ params }) {
   } else {
     const { data, error } = await supabase
       .from("cases")
-      .select("*, agencies(name)")
+      .select("*, agencies(id, name, method, portal_url, email, form_url, address, phone, notes)")
       .eq("id", id)
       .single();
     if (error || !data) {
